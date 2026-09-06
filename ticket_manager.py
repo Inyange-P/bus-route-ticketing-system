@@ -76,13 +76,14 @@ class TicketManager:
     def search_ticket(self, ticket_id):
 # Search for a ticket using its ID. Return the ticket if found.
 
-        if not isinstance(ticket_id, int):
-            raise TypeError("Ticket ID must be an integer.")
+# In Python, bool is technically a subclass of int, so isinstance(True, int) is True.  Without this extra check, someone could accidentally search using True/False and it would silently be treated as 1/0 instead of being rejected as invalid input.
+     if isinstance(ticket_id, bool) or not isinstance(ticket_id, int):
+        raise TypeError("Ticket ID must be an integer.")
 
-        if ticket_id <= 0:
-            raise ValueError("Ticket ID must be greater than zero.")
+     if ticket_id <= 0:
+        raise ValueError("Ticket ID must be greater than zero.")
 
-        return self.tickets.get(ticket_id)
+     return self.tickets.get(ticket_id)
 
     def display_all_tickets(self):
 # Show all tickets in the system.
