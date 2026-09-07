@@ -77,3 +77,20 @@ class RouteManager:
             route.base_fare = base_fare
 
         return route
+
+    def delete_route(self, route_id, trips=None):
+        # Check if the route exists.
+        if route_id not in self.routes:
+            return False
+
+      # Check if any trip belongs to this route.
+        if trips is not None:
+            for trip in trips.values():
+                if trip.route_id == route_id:
+                    raise ValueError(
+                    "Route cannot be deleted because it has existing trips."
+                )
+
+        del self.routes[route_id]
+
+        return True
