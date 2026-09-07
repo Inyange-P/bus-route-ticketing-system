@@ -29,6 +29,15 @@ class RouteManager:
 
         #store the route using its ID.
         self.routes[route_id] = route
-        
+
         return route
-    
+
+    def display_routes(self):
+        # check i there are any routes to display
+        if not self.routes:
+            print("No routes available.")
+            return
+
+        print("\n----- AVAILABLE ROUTES -----")
+        for route in self.routes.values():
+            print(route)
