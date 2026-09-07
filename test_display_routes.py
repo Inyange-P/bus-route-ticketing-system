@@ -15,7 +15,7 @@ manager.add_route(
 manager.add_route(
     "Port Louis",
     "Bagatelle",
-    12,
+    10,
     30
 )
 
