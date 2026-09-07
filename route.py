@@ -17,5 +17,5 @@ class Route:
             f"Origin: {self.origin} | "
             f"Destination: {self.destination} | "
             f"Distance: {self.distance_km} km | "
-            f"Base Fare: ${self.base_fare:.2f}"
+            f"Base Fare: Rs {self.base_fare:.2f}"
         )
