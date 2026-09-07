@@ -51,3 +51,29 @@ class RouteManager:
                 matches.append(route)
 
         return matches
+
+    def update_route(
+            self,
+            route_id,
+            origin=None,
+            destination=None,
+            distance_km=None,
+            base_fare=None
+    ):
+        # check if th e route exists
+        if route_id not in self.routes:
+            return None
+
+        route = self.routes[route_id]
+
+        # update the route attributes if provided
+        if origin is not None:
+            route.origin = origin
+        if destination is not None:
+            route.destination = destination
+        if distance_km is not None:
+            route.distance_km = distance_km
+        if base_fare is not None:
+            route.base_fare = base_fare
+
+        return route
