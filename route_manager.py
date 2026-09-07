@@ -41,3 +41,13 @@ class RouteManager:
         print("\n----- AVAILABLE ROUTES -----")
         for route in self.routes.values():
             print(route)
+
+    def search_routes(self, destination):
+        # store any routes that match the destination
+        matches = []
+
+        for route in self.routes.values():
+            if route.destination.lower() == destination.lower():
+                matches.append(route)
+
+        return matches
