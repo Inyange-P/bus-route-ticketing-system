@@ -13,3 +13,22 @@ class RouteManager:
 
         #otherwise, continue from the highest existing route ID.
         return max(self.routes.keys()) + 1
+
+    def add_route(self, origin, destination, distance_km, base_fare):
+        # Generate a new ID for the route.
+        route_id = self.generate_route_id()
+
+        # Create a new Route object.
+        route = Route(
+            route_id,
+            origin,
+            destination,
+            distance_km,
+            base_fare
+        )
+
+        #store the route using its ID.
+        self.routes[route_id] = route
+        
+        return route
+    
