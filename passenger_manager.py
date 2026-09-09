@@ -19,6 +19,17 @@ class PassengerManager:
         self.passengers[passenger_id] = passenger
         return passenger
 
+    def search_passenger(self, passenger_id=None, name=None, phone=None):
+        matches = []
+        for passenger in self.passengers.values():
+            if passenger_id is not None and passenger.passenger_id == passenger_id:
+                matches.append(passenger)
+            elif name is not None and passenger.name.lower() == name.lower():
+                matches.append(passenger)
+            elif phone is not None and passenger.phone == phone:
+                matches.append(passenger)
+        return matches
+
     def display_passengers(self):
         if not self.passengers:
             print("No passengers registered.")
