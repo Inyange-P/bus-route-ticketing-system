@@ -62,3 +62,13 @@ class BusPassManager:
             return False, "Bus pass has expired."
 
         return True, "Bus pass is valid."
+
+    def renew_pass(self, pass_id, new_expiry_date):
+        if pass_id not in self.bus_passes:
+            print("Cannot renew: Bus pass does not exist.")
+            return None
+
+        bus_pass = self.bus_passes[pass_id]
+        bus_pass.expiry_date = new_expiry_date
+        bus_pass.status = "active"  # Reactivate the pass upon renewal
+        return bus_pass
