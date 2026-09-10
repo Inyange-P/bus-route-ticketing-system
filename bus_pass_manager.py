@@ -34,3 +34,12 @@ class BusPassManager:
         for bus_pass in self.bus_passes.values():
             print(bus_pass)
 
+
+    def search_pass(self, pass_id=None, passenger_id=None):
+        matches = []
+        for bus_pass in self.bus_passes.values():
+            if pass_id is not None and bus_pass.pass_id == pass_id:
+                matches.append(bus_pass)
+            elif passenger_id is not None and bus_pass.passenger_id == passenger_id:
+                matches.append(bus_pass)
+        return matches
