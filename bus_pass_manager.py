@@ -1,3 +1,4 @@
+from datetime import datetime
 from bus_pass import BusPass
 
 class BusPassManager:
@@ -43,3 +44,21 @@ class BusPassManager:
             elif passenger_id is not None and bus_pass.passenger_id == passenger_id:
                 matches.append(bus_pass)
         return matches
+
+    def is_pass_valid(self, pass_id, travel_date):
+        # checks whether a bus pass can be used for a discount/free travel on the given date 
+        if pass_id not in self.bus_passes:
+            return False, "Bus pass not found."
+
+        bus_pass = self.bus_passes[pass_id]
+
+        if bus_pass.status != "active":
+            return False, "Bus pass is not active."
+
+        expiry_date = datetime.strptime(bus_pass.expiry_date, "%Y-%m-%d")
+        travel_date = datetime.strptime(travel_date, "%Y-%m-%d")
+
+        if travel_date > expiry_date:
+            return False, "Bus pass has expired."
+
+        return True, "Bus pass is valid."
