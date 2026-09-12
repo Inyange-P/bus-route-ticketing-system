@@ -54,6 +54,35 @@ class TestTripManager(unittest.TestCase):
 
         self.assertEqual(len(self.manager.trips), 2)
 
+    def test_search_by_route(self):
+        # Only trips matching the given route_id should come back
+        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+
+        results = self.manager.search_trips(route_id="R001")
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].route_id, "R001")
+
+    def test_search_by_date(self):
+        # Only trips matching the given date should come back
+        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+
+        results = self.manager.search_trips(date="2026-09-16")
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].date, "2026-09-16")
+
+    def test_search_with_no_filters_returns_all(self):
+        # Calling search_trips() with nothing should return every trip
+        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+
+        results = self.manager.search_trips()
+
+        self.assertEqual(len(results), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
