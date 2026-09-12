@@ -13,3 +13,30 @@ class Trip:
         return (f"Trip {self.trip_id} | Route: {self.route_id} | "
                 f"Date: {self.date} | Departure: {self.departure_time} | "
                 f"Arrival: {self.arrival_time} | Seats: {self.total_seats}")
+
+
+    def view_seat_layout(self):
+        # Builds a readable string showing every seat and its status
+        layout = ""
+
+        for seat_number, is_available in self.seats.items():
+            # O means open/available, X means booked
+            status = "O" if is_available else "X"
+            layout += f"[{seat_number}:{status}] "
+
+        return layout.strip()
+
+
+    def is_seat_available(self, seat_number):
+        # Checks if a given seat number is free.
+        # .get() looks up the seat safely — if the seat doesn't exist, it returns False instead of crashing
+        return self.seats.get(seat_number, False)
+
+    def book_seat(self, seat_number):
+        # Only book the seat if it's actually available
+        if self.is_seat_available(seat_number):
+            self.seats[seat_number] = False
+            return True
+
+        # Seat was already booked or doesn't exist
+        return False
