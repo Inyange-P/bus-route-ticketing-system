@@ -83,3 +83,15 @@ class TripManager:
 
         # No trip with that ID was found
         return False
+
+
+    def cancel_trip(self, trip_id):
+        # Go through every trip looking for a matching ID
+        for trip in self.trips:
+            if trip.trip_id == trip_id:
+                # Remove it from the list entirely
+                self.trips.remove(trip)
+                return True
+
+        # No trip with that ID was found
+        return False
