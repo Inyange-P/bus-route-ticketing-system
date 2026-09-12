@@ -38,6 +38,47 @@ def test_trip_str(self):
     self.assertIn("T002", str(trip))
 
 
+    def test_seat_layout_populated_after_add_trip(self):
+        # Seats only get filled in when created through TripManager.add_trip,
+        # so we simulate that here directly on the Trip object
+        trip = Trip("T003", "R001", "2026-09-15", "08:00", "12:00", 3)
+        trip.seats = {1: True, 2: True, 3: True}
+
+        layout = trip.view_seat_layout()
+        self.assertIn("[1:O]", layout)
+        self.assertIn("[2:O]", layout)
+        self.assertIn("[3:O]", layout)
+
+    def test_is_seat_available(self):
+        trip = Trip("T004", "R001", "2026-09-15", "08:00", "12:00", 3)
+        trip.seats = {1: True, 2: False, 3: True}
+
+        self.assertTrue(trip.is_seat_available(1))
+        self.assertFalse(trip.is_seat_available(2))
+
+    def test_is_seat_available_invalid_seat(self):
+        # Asking about a seat number that doesn't exist should return False, not crash
+        trip = Trip("T005", "R001", "2026-09-15", "08:00", "12:00", 3)
+        trip.seats = {1: True, 2: True, 3: True}
+
+        self.assertFalse(trip.is_seat_available(99))
+
+    def test_book_seat_success(self):
+        trip = Trip("T006", "R001", "2026-09-15", "08:00", "12:00", 3)
+        trip.seats = {1: True, 2: True, 3: True}
+
+        result = trip.book_seat(1)
+        self.assertTrue(result)
+        self.assertFalse(trip.seats[1])  # seat 1 should now be booked
+
+    def test_book_seat_already_booked(self):
+        trip = Trip("T007", "R001", "2026-09-15", "08:00", "12:00", 3)
+        trip.seats = {1: False, 2: True, 3: True}  # seat 1 already booked
+
+        result = trip.book_seat(1)
+        self.assertFalse(result)  # booking should fail
+
+
 if __name__ == "__main__":
     unittest.main()
     
