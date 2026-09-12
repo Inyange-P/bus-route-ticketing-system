@@ -24,3 +24,44 @@ class TripManager:
         self.next_id += 1
 
         return trip_id
+
+
+    def add_trip(self, route_id, date, departure_time, arrival_time, total_seats):
+
+        # Get a new unique ID for this trip
+        trip_id = self.generate_trip_id()
+
+        # Create the actual Trip object using the Trip class
+        new_trip = Trip(trip_id, route_id, date, departure_time, arrival_time, total_seats)
+
+        # Build the seat dictionary: every seat from 1 to total_seats starts as available (True)
+        new_trip.seats = {i: True for i in range(1, total_seats + 1)}
+
+        # Save this trip into our list of all trips
+        self.trips.append(new_trip)
+
+        return new_trip
+
+    def display_trips(self):
+        # If there are no trips yet, say so instead of printing nothing
+        if not self.trips:
+            print("No trips available.")
+            return
+
+        # Otherwise, print each trip using Trip's __str__ method
+        for trip in self.trips:
+            print(trip)
+
+    def search_trips(self, route_id=None, date=None):
+        # Start with all trips, then narrow down based on what was given
+        results = self.trips
+
+        # If a route_id was provided, keep only trips matching that route
+        if route_id:
+            results = [t for t in results if t.route_id == route_id]
+
+        # If a date was provided, keep only trips matching that date
+        if date:
+            results = [t for t in results if t.date == date]
+
+        return results
