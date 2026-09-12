@@ -65,3 +65,21 @@ class TripManager:
             results = [t for t in results if t.date == date]
 
         return results
+
+
+    def update_trip(self, trip_id, date=None, departure_time=None, arrival_time=None):
+        # Go through every trip looking for a matching ID
+        for trip in self.trips:
+            if trip.trip_id == trip_id:
+                # Only update fields that were actually given a new value
+                if date:
+                    trip.date = date
+                if departure_time:
+                    trip.departure_time = departure_time
+                if arrival_time:
+                    trip.arrival_time = arrival_time
+
+                return True
+
+        # No trip with that ID was found
+        return False
