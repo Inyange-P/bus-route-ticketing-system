@@ -84,5 +84,46 @@ class TestTripManager(unittest.TestCase):
         self.assertEqual(len(results), 2)
 
 
+    def test_update_trip(self):
+        # Update should change only the fields provided
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+
+        result = self.manager.update_trip(trip.trip_id, date="2026-09-20")
+
+        self.assertTrue(result)
+        self.assertEqual(trip.date, "2026-09-20")
+        self.assertEqual(trip.departure_time, "08:00")  # unchanged
+
+    def test_update_trip_multiple_fields(self):
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+
+        self.manager.update_trip(
+            trip.trip_id,
+            departure_time="09:00",
+            arrival_time="13:00"
+        )
+
+        self.assertEqual(trip.departure_time, "09:00")
+        self.assertEqual(trip.arrival_time, "13:00")
+
+    def test_update_trip_not_found(self):
+        # Updating a trip ID that doesn't exist should return False
+        result = self.manager.update_trip("T999", date="2026-09-20")
+        self.assertFalse(result)
+
+    def test_cancel_trip(self):
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+
+        result = self.manager.cancel_trip(trip.trip_id)
+
+        self.assertTrue(result)
+        self.assertEqual(len(self.manager.trips), 0)
+
+    def test_cancel_trip_not_found(self):
+        # Cancelling a trip ID that doesn't exist should return False
+        result = self.manager.cancel_trip("T999")
+        self.assertFalse(result)
+
+
 if __name__ == "__main__":
     unittest.main()
