@@ -147,7 +147,7 @@ class TicketManager:
     def get_tickets_by_passenger(self, passenger_id):
 # Return all tickets belonging to one passenger.
 
-        if not isinstance(passenger_id, int):
+        if isinstance(passenger_id, bool) or not isinstance(passenger_id, int):
             raise TypeError(
                 "Passenger ID must be an integer."
             )
@@ -168,7 +168,7 @@ class TicketManager:
     def get_tickets_by_trip(self, trip_id):
 # Return all tickets for one trip.
 
-        if not isinstance(trip_id, int):
+        if isinstance(trip_id, bool) or not isinstance(trip_id, int):
             raise TypeError(
                 "Trip ID must be an integer."
             )
