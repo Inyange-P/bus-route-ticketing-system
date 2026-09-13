@@ -29,12 +29,14 @@ class PassengerManager:
     def search_passenger(self, passenger_id=None, name=None, phone=None):
         matches = []
         for passenger in self.passengers.values():
-            if passenger_id is not None and passenger.passenger_id == passenger_id:
-                matches.append(passenger)
-            elif name is not None and passenger.name.lower() == name.lower():
-                matches.append(passenger)
-            elif phone is not None and passenger.phone == phone:
-                matches.append(passenger)
+            if passenger_id is not None and passenger.passenger_id != passenger_id:
+                continue
+            if name is not None and passenger.name.lower() != name.lower():
+                continue
+            if phone is not None and passenger.phone != phone:
+                continue
+            
+            matches.append(passenger)
         return matches
 
     def display_passengers(self):
