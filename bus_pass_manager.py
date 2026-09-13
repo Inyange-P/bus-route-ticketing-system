@@ -1,5 +1,5 @@
 from utils.validation import validate_pass_type, validate_date_order, validate_status
-from datetime import datetime
+from datetime import datetime, date
 from bus_pass import BusPass
 
 class BusPassManager:
@@ -61,8 +61,19 @@ class BusPassManager:
         if bus_pass.status != "active":
             return False, "Bus pass is not active."
 
-        expiry_date = datetime.strptime(bus_pass.expiry_date, "%Y-%m-%d")
-        travel_date = datetime.strptime(travel_date, "%Y-%m-%d")
+        expiry_date = datetime.strptime(bus_pass.expiry_date, "%Y-%m-%d").date()
+
+
+        # travel_date might come in as a string, or as a real date/datetime object.
+        if isinstance(travel_date, str):
+            travel_date = datetime.strptime(travel_date, "%Y-%m-%d").date()
+        elif isinstance(travel_date, datetime):
+            travel_date = travel_date.date()
+        elif isinstance(travel_date, date):
+            travel_date = travel_date
+        else:
+            print("Invalid travel date format.")
+            return False, "Invalid travel date format."
 
         if travel_date > expiry_date:
             return False, "Bus pass has expired."
