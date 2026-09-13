@@ -49,9 +49,17 @@ class PassengerManager:
         if passenger_id not in self.passengers:
             print(f"No passenger found with ID {passenger_id}.")
             return None
+        
         passenger = self.passengers[passenger_id]
+
         if name is not None:
+            if not validate_name(name):
+                return None
             passenger.name = name
+
         if phone is not None:
+            if not validate_phone(phone):
+                return None
             passenger.phone = phone
+
         return passenger
