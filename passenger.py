@@ -10,7 +10,7 @@ class Passenger:
     def __str__(self):
         # Return the passenger information in a readable format.
         return ( 
-            f"Passenger(ID: {self.passenger_id} | "
+            f"Passenger ID: {self.passenger_id} | "
             f"Name: {self.name} | " 
             f"Phone: {self.phone}"
         )
