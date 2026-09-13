@@ -22,3 +22,13 @@ def validate_passenger_exists(passenger_id, passengers):
         return False
     return True
 
+def validate_phone(phone):
+    # Validate that the phone number is a string of digits and has a reasonable length.
+    phone = phone.strip()  # Remove leading and trailing whitespace
+    if not phone.isdigit():
+        print("Invalid phone number: must contain digits only.")
+        return False
+    if len(phone) < 7 or len(phone) > 15:
+        print("Invalid phone number: length must be between 7 and 15 digits.")
+        return False
+    return True

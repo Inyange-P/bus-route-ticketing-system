@@ -1,3 +1,4 @@
+from utils.validation import validate_name, validate_phone
 from passenger import Passenger
 
 class PassengerManager:
@@ -14,6 +15,12 @@ class PassengerManager:
         return max(self.passengers.keys()) + 1
 
     def register_passenger(self, name, phone):
+        if not validate_name(name):
+            return None
+        if not validate_phone(phone):
+            return None
+        
+        # Both name and phone are valid, proceed with registration.
         passenger_id = self.generate_passenger_id()
         passenger = Passenger(passenger_id, name, phone)
         self.passengers[passenger_id] = passenger
