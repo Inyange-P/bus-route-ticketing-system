@@ -83,31 +83,4 @@ class TripManager:
 
         return layout.strip()
 
-    def update_trip(self, trip_id, date=None, departure_time=None, arrival_time=None):
-        # Go through every trip looking for a matching ID
-        for trip in self.trips:
-            if trip.trip_id == trip_id:
-                # Only update fields that were actually given a new value
-                if date:
-                    trip.date = date
-                if departure_time:
-                    trip.departure_time = departure_time
-                if arrival_time:
-                    trip.arrival_time = arrival_time
-
-                return True
-
-        # No trip with that ID was found
-        return False
-
-
-    def cancel_trip(self, trip_id):
-        # Go through every trip looking for a matching ID
-        for trip in self.trips:
-            if trip.trip_id == trip_id:
-                # Remove it from the list entirely
-                self.trips.remove(trip)
-                return True
-
-        # No trip with that ID was found
-        return False
+    
