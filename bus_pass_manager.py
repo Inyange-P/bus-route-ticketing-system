@@ -1,3 +1,4 @@
+from utils.validation import validate_pass_type, validate_date_order
 from datetime import datetime
 from bus_pass import BusPass
 
@@ -15,6 +16,11 @@ class BusPassManager:
         return max(self.bus_passes.keys()) + 1
 
     def issue_pass(self, passenger_id, pass_type, issue_date, expiry_date):
+        if not validate_pass_type(pass_type):
+            return None
+        if not validate_date_order(issue_date, expiry_date):
+            return None
+        
         # a passenger cannot have more than one active pass of the same type at the same time.
         for bus_pass in self.bus_passes.values():
             if bus_pass.passenger_id == passenger_id and bus_pass.status == "active":
