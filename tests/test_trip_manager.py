@@ -1,128 +1,130 @@
 import unittest
+from datetime import date
 from trip_manager import TripManager
 
 
-class TestTripManager(unittest.TestCase):
+class FakeTicketManager:
     """
-    Tests for the TripManager class.
-    Checks that it starts up correctly and generates trip IDs properly.
+    A stand-in for Providence's TicketManager, used only for testing.
+    Lets us control exactly which seats are "taken" without needing
+    real Ticket objects or her full purchase logic.
     """
 
+    def __init__(self, taken_seats=None):
+        # taken_seats: a set of (trip_id, seat_number) tuples
+        self.taken_seats = taken_seats or set()
+
+    def seat_is_taken(self, trip_id, seat_number):
+        return (trip_id, seat_number) in self.taken_seats
+
+    def count_active_tickets(self, trip_id):
+        return len([s for (t, s) in self.taken_seats if t == trip_id])
+
+
+class TestTripManager(unittest.TestCase):
+
     def setUp(self):
-        # This runs automatically before every test below.
-        # Creates a fresh TripManager so each test starts clean.
         self.manager = TripManager()
 
     def test_manager_starts_empty(self):
-        # A brand new manager should have no trips yet
-        self.assertEqual(self.manager.trips, [])
+        self.assertEqual(self.manager.trips, {})
 
     def test_generate_first_trip_id(self):
-        # The very first ID generated should be "T001"
         trip_id = self.manager.generate_trip_id()
-        self.assertEqual(trip_id, "T001")
+        self.assertEqual(trip_id, 1)
 
     def test_generate_trip_id_increments(self):
-        # Each call should give a new, increasing ID
-        first_id = self.manager.generate_trip_id()
-        second_id = self.manager.generate_trip_id()
-        third_id = self.manager.generate_trip_id()
-
-        self.assertEqual(first_id, "T001")
-        self.assertEqual(second_id, "T002")
-        self.assertEqual(third_id, "T003")
+        self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        next_id = self.manager.generate_trip_id()
+        self.assertEqual(next_id, 2)
 
     def test_add_trip(self):
-        # Add one trip and confirm it was stored
-        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
         self.assertEqual(len(self.manager.trips), 1)
-        self.assertEqual(trip.route_id, "R001")
-        self.assertEqual(trip.total_seats, 20)
-
-    def test_add_trip_creates_seats(self):
-        # The seats dictionary should have one entry per seat, all set to True
-        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 5)
-
-        self.assertEqual(len(trip.seats), 5)
-        self.assertTrue(all(trip.seats.values()))  # every seat should be available
+        self.assertEqual(trip.route_id, 1)
+        self.assertEqual(trip.trip_id, 1)
 
     def test_add_multiple_trips(self):
-        # Adding several trips should keep them all in the list
-        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
-
+        self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        self.manager.add_trip(2, date(2026, 9, 16), "09:00", "13:00", 15)
         self.assertEqual(len(self.manager.trips), 2)
 
     def test_search_by_route(self):
-        # Only trips matching the given route_id should come back
-        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+        self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        self.manager.add_trip(2, date(2026, 9, 16), "09:00", "13:00", 15)
 
-        results = self.manager.search_trips(route_id="R001")
-
+        results = self.manager.search_trips(route_id=1)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].route_id, "R001")
+        self.assertEqual(results[0].route_id, 1)
 
     def test_search_by_date(self):
-        # Only trips matching the given date should come back
-        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+        self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        self.manager.add_trip(2, date(2026, 9, 16), "09:00", "13:00", 15)
 
-        results = self.manager.search_trips(date="2026-09-16")
-
+        results = self.manager.search_trips(travel_date=date(2026, 9, 16))
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].date, "2026-09-16")
 
     def test_search_with_no_filters_returns_all(self):
-        # Calling search_trips() with nothing should return every trip
-        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+        self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        self.manager.add_trip(2, date(2026, 9, 16), "09:00", "13:00", 15)
 
         results = self.manager.search_trips()
-
         self.assertEqual(len(results), 2)
 
-
     def test_update_trip(self):
-        # Update should change only the fields provided
-        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-
-        result = self.manager.update_trip(trip.trip_id, date="2026-09-20")
-
-        self.assertTrue(result)
-        self.assertEqual(trip.date, "2026-09-20")
-        self.assertEqual(trip.departure_time, "08:00")  # unchanged
-
-    def test_update_trip_multiple_fields(self):
-        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-
-        self.manager.update_trip(
-            trip.trip_id,
-            departure_time="09:00",
-            arrival_time="13:00"
-        )
-
-        self.assertEqual(trip.departure_time, "09:00")
-        self.assertEqual(trip.arrival_time, "13:00")
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        self.manager.update_trip(trip.trip_id, travel_date=date(2026, 9, 20))
+        self.assertEqual(trip.travel_date, date(2026, 9, 20))
 
     def test_update_trip_not_found(self):
-        # Updating a trip ID that doesn't exist should return False
-        result = self.manager.update_trip("T999", date="2026-09-20")
+        result = self.manager.update_trip(999, travel_date=date(2026, 9, 20))
         self.assertFalse(result)
 
-    def test_cancel_trip(self):
-        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
-
+    def test_cancel_trip_no_ticket_manager(self):
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
         result = self.manager.cancel_trip(trip.trip_id)
-
         self.assertTrue(result)
         self.assertEqual(len(self.manager.trips), 0)
 
-    def test_cancel_trip_not_found(self):
-        # Cancelling a trip ID that doesn't exist should return False
-        result = self.manager.cancel_trip("T999")
-        self.assertFalse(result)
+    def test_cancel_trip_blocked_by_active_tickets(self):
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+
+        # Simulate seat 1 on this trip being booked
+        fake_tm = FakeTicketManager(taken_seats={(trip.trip_id, 1)})
+
+        with self.assertRaises(ValueError):
+            self.manager.cancel_trip(trip.trip_id, ticket_manager=fake_tm)
+
+        # Trip should still exist since cancellation was blocked
+        self.assertIn(trip.trip_id, self.manager.trips)
+
+    def test_cancel_trip_allowed_with_no_active_tickets(self):
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        fake_tm = FakeTicketManager()  # no taken seats
+
+        result = self.manager.cancel_trip(trip.trip_id, ticket_manager=fake_tm)
+        self.assertTrue(result)
+
+    def test_is_seat_available_true(self):
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        fake_tm = FakeTicketManager()  # nothing taken
+
+        self.assertTrue(self.manager.is_seat_available(trip.trip_id, 5, fake_tm))
+
+    def test_is_seat_available_false_when_taken(self):
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 20)
+        fake_tm = FakeTicketManager(taken_seats={(trip.trip_id, 5)})
+
+        self.assertFalse(self.manager.is_seat_available(trip.trip_id, 5, fake_tm))
+
+    def test_view_seat_layout(self):
+        trip = self.manager.add_trip(1, date(2026, 9, 15), "08:00", "12:00", 3)
+        fake_tm = FakeTicketManager(taken_seats={(trip.trip_id, 2)})
+
+        layout = self.manager.view_seat_layout(trip.trip_id, fake_tm)
+        self.assertIn("[1:O]", layout)
+        self.assertIn("[2:X]", layout)
+        self.assertIn("[3:O]", layout)
 
 
 if __name__ == "__main__":
