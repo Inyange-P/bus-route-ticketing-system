@@ -52,3 +52,10 @@ def validate_date_order(issue_date, expiry_date):
         return False
     return True
 
+def validate_status(status):
+    # Validate that the status is either "active", "suspended", "cancelled".
+    valid_statuses = ["active", "suspended", "cancelled"]
+    if status not in valid_statuses:
+        print(f"Invalid status: must be one of {valid_statuses}.")
+        return False
+    return True

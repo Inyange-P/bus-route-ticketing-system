@@ -1,4 +1,4 @@
-from utils.validation import validate_pass_type, validate_date_order
+from utils.validation import validate_pass_type, validate_date_order, validate_status
 from datetime import datetime
 from bus_pass import BusPass
 
@@ -80,6 +80,10 @@ class BusPassManager:
         return bus_pass
 
     def set_pass_status(self, pass_id, status):
+        if not validate_status(status):
+            print("Cannot update status: Invalid status.")
+            return None
+
         # status should be "suspended" or "cancelled"
         if pass_id not in self.bus_passes:
             print("Cannot update status: Bus pass does not exist.")
