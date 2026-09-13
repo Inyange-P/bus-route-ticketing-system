@@ -75,6 +75,10 @@ class BusPassManager:
             return None
 
         bus_pass = self.bus_passes[pass_id]
+
+        if not validate_date_order(bus_pass.issue_date, new_expiry_date):
+            return None
+        
         bus_pass.expiry_date = new_expiry_date
         bus_pass.status = "active"  # Reactivate the pass upon renewal
         return bus_pass
