@@ -1,0 +1,129 @@
+import unittest
+from trip_manager import TripManager
+
+
+class TestTripManager(unittest.TestCase):
+    """
+    Tests for the TripManager class.
+    Checks that it starts up correctly and generates trip IDs properly.
+    """
+
+    def setUp(self):
+        # This runs automatically before every test below.
+        # Creates a fresh TripManager so each test starts clean.
+        self.manager = TripManager()
+
+    def test_manager_starts_empty(self):
+        # A brand new manager should have no trips yet
+        self.assertEqual(self.manager.trips, [])
+
+    def test_generate_first_trip_id(self):
+        # The very first ID generated should be "T001"
+        trip_id = self.manager.generate_trip_id()
+        self.assertEqual(trip_id, "T001")
+
+    def test_generate_trip_id_increments(self):
+        # Each call should give a new, increasing ID
+        first_id = self.manager.generate_trip_id()
+        second_id = self.manager.generate_trip_id()
+        third_id = self.manager.generate_trip_id()
+
+        self.assertEqual(first_id, "T001")
+        self.assertEqual(second_id, "T002")
+        self.assertEqual(third_id, "T003")
+
+    def test_add_trip(self):
+        # Add one trip and confirm it was stored
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+
+        self.assertEqual(len(self.manager.trips), 1)
+        self.assertEqual(trip.route_id, "R001")
+        self.assertEqual(trip.total_seats, 20)
+
+    def test_add_trip_creates_seats(self):
+        # The seats dictionary should have one entry per seat, all set to True
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 5)
+
+        self.assertEqual(len(trip.seats), 5)
+        self.assertTrue(all(trip.seats.values()))  # every seat should be available
+
+    def test_add_multiple_trips(self):
+        # Adding several trips should keep them all in the list
+        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+
+        self.assertEqual(len(self.manager.trips), 2)
+
+    def test_search_by_route(self):
+        # Only trips matching the given route_id should come back
+        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+
+        results = self.manager.search_trips(route_id="R001")
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].route_id, "R001")
+
+    def test_search_by_date(self):
+        # Only trips matching the given date should come back
+        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+
+        results = self.manager.search_trips(date="2026-09-16")
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].date, "2026-09-16")
+
+    def test_search_with_no_filters_returns_all(self):
+        # Calling search_trips() with nothing should return every trip
+        self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+        self.manager.add_trip("R002", "2026-09-16", "09:00", "13:00", 15)
+
+        results = self.manager.search_trips()
+
+        self.assertEqual(len(results), 2)
+
+
+    def test_update_trip(self):
+        # Update should change only the fields provided
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+
+        result = self.manager.update_trip(trip.trip_id, date="2026-09-20")
+
+        self.assertTrue(result)
+        self.assertEqual(trip.date, "2026-09-20")
+        self.assertEqual(trip.departure_time, "08:00")  # unchanged
+
+    def test_update_trip_multiple_fields(self):
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+
+        self.manager.update_trip(
+            trip.trip_id,
+            departure_time="09:00",
+            arrival_time="13:00"
+        )
+
+        self.assertEqual(trip.departure_time, "09:00")
+        self.assertEqual(trip.arrival_time, "13:00")
+
+    def test_update_trip_not_found(self):
+        # Updating a trip ID that doesn't exist should return False
+        result = self.manager.update_trip("T999", date="2026-09-20")
+        self.assertFalse(result)
+
+    def test_cancel_trip(self):
+        trip = self.manager.add_trip("R001", "2026-09-15", "08:00", "12:00", 20)
+
+        result = self.manager.cancel_trip(trip.trip_id)
+
+        self.assertTrue(result)
+        self.assertEqual(len(self.manager.trips), 0)
+
+    def test_cancel_trip_not_found(self):
+        # Cancelling a trip ID that doesn't exist should return False
+        result = self.manager.cancel_trip("T999")
+        self.assertFalse(result)
+
+
+if __name__ == "__main__":
+    unittest.main()
