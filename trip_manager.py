@@ -3,10 +3,7 @@ from trip import Trip
 
 
 class TripManager:
-    """
-    Manages all trips in the system.
-    Handles creating, storing, and generating IDs for trips.
-    """
+# Manages all trips in the system. Handles creating, storing, and generating IDs for trips. 
 
     def __init__(self):
         # A list to hold every Trip object that gets created
