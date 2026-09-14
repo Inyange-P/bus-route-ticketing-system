@@ -1,4 +1,4 @@
-from utils.validation import validate_pass_type, validate_date_order, validate_status
+from utils.validation import validate_pass_type, validate_date_order, validate_status, parse_date
 from datetime import datetime, date
 from bus_pass import BusPass
 
@@ -61,8 +61,17 @@ class BusPassManager:
         if bus_pass.status != "active":
             return False, "Bus pass is not active."
 
-        expiry_date = datetime.strptime(bus_pass.expiry_date, "%Y-%m-%d").date()
+        try: 
+            expiry_date = parse_date(bus_pass.expiry_date)
+            travel_date = parse_date(travel_date)
+        except ValueError:
+            print("Invalid date format.")
+            return False
 
+        if travel_date > expiry_date:
+            return False
+
+        return True
 
         # travel_date might come in as a string, or as a real date/datetime object.
         if isinstance(travel_date, str):

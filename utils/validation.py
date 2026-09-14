@@ -45,9 +45,12 @@ def validate_pass_type(pass_type):
 
 def validate_date_order(issue_date, expiry_date):
     # Validate that the issue date is before the expiry date.
-    from datetime import datetime
-    issue = datetime.strptime(issue_date, "%Y-%m-%d")
-    expiry = datetime.strptime(expiry_date, "%Y-%m-%d")
+    try:
+        issue = parse_date(issue_date)
+        expiry = parse_date(expiry_date)
+    except ValueError:
+        print("Invalid date format.")
+        return False
 
     if expiry <= issue:
         print("Invalid dates: expiry date must be after issue date.")
