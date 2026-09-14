@@ -1,5 +1,9 @@
+from datetime import date
 from passenger_manager import PassengerManager
 from bus_pass_manager import BusPassManager
+from ticket_manager import TicketManager
+from ticket import Ticket
+from utils.file_handler import save_tickets, load_tickets
 from utils.file_handler import save_passengers, load_passengers, save_bus_passes, load_bus_passes
 
 manager = PassengerManager()
@@ -24,4 +28,11 @@ print("\nLoading bus passes back:")
 loaded_passes = load_bus_passes()
 for bus_pass in loaded_passes.values():
     print(bus_pass)
+
+m = TicketManager()
+m.add_ticket(Ticket(ticket_id=1, passenger_id=101, trip_id=1, seat_number=5, price=50))
+save_tickets(m.tickets, filename='tickets.json')
+reloaded = load_tickets(filename='tickets.json')
+print(reloaded[1])
+
     

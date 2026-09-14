@@ -55,10 +55,10 @@ ticket = manager.purchase_ticket(
 class TestStudentPass:
     def __init__(self):
         self.pass_id = 1
-        self.passenger_id = 999
+        self.passenger_id = 101
         self.pass_type = "student"
         self.status = "active"
-        self.expiry_date = date(2026, 1, 1)
+        self.expiry_date = date(2027, 1, 1)
 passes = {
         1: TestStudentPass()
 }
