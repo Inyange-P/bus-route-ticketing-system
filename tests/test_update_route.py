@@ -1,37 +1,34 @@
 from route_manager import RouteManager
 
-manager = RouteManager()
+def test_update_fare_keeps_other_details():
+    manager = RouteManager()
+    route = manager.add_route("Pamplemousses", "Port Louis", 17, 40)
 
-route = manager.add_route(
-    "Pamplemousses",
-    "Port Louis",
-    17,
-    40
-)
-print("Before update:")
-print(route)
+    updated_route = manager.update_route(1, base_fare=45)
 
-updated_route = manager.update_route(
-    route_id=1,
-    base_fare=45
-)
+    assert updated_route is route
+    assert manager.routes[1] is route
+    assert route.base_fare == 45
+    assert route.origin == "Pamplemousses"
+    assert route.destination == "Port Louis"
+    assert route.distance_km == 17
 
-print("\nAfter changing fare:")
-print(updated_route)
+def test_update_destination_and_distance():
+    manager = RouteManager()
+    route = manager.add_route("Pamplemousses", "Port Louis", 17, 40)
 
-updated_route = manager.update_route(
-    route_id=1,
-    destination="Grand Baie",
-    distance_km=20
-)
-print("\nAfter changing destination and distance:")
-print(updated_route)
+    updated_route = manager.update_route(1, destination="Grand Baie", distance_km=20)
 
-print("\nTrying to update a route that does not exist:")
+    assert updated_route is route
+    assert route.destination == "Grand Baie"
+    assert route.distance_km == 20
+    assert route.origin == "Pamplemousses"
+    assert route.base_fare == 40
 
-result = manager.update_route(
-    route_id=99,
-    base_fare=100
-)
-if result is None:
-    print("No route found.")
+def test_update_missing_route_returns_none():
+    manager = RouteManager()
+    route = manager.add_route("Pamplemousses", "Port Louis", 17, 40)
+
+    assert manager.update_route(99, base_fare=100) is None
+    assert manager.routes == {1: route}
+    assert route.base_fare == 40
