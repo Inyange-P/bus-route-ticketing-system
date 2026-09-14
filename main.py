@@ -87,6 +87,20 @@ def route_menu():
             except ValueError:
                 print("Invalid number entered.")
 
+        elif choice == "5":
+            try:
+                route_id = int(input("Enter route ID to delete: "))
+
+                result = route_manager.delete_route(route_id)
+
+                if result:
+                    print("Route deleted successfully.")
+                else:
+                    print("Route not found.")
+
+            except ValueError as error:
+                print(error)
+
         elif choice == "0":
             break
 
