@@ -37,12 +37,14 @@ def route_menu():
             except ValueError:
                 print("Invalid number entered.")
 
+        elif choice == "2":
+            route_manager.display_routes()
+
         elif choice == "0":
             break
 
         else:
             print("Feature coming next.")
-
 
 def main():
     while True:
@@ -61,7 +63,6 @@ def main():
 
         else:
             print("Invalid choice.")
-
 
 if __name__ == "__main__":
     main()
