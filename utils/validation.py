@@ -1,5 +1,4 @@
 # Shared validation functions for the bus route and ticket management system
-# Chinelo's section: Passenger and BusPass validation functions
 
 def validate_name(name):
     # Validate that the name is a non-empty string.
@@ -94,14 +93,23 @@ def validate_seat_number(seat_number, total_seats):
 
     return seat_number <= total_seats
 
-
-
-
 # Abigail's section: Route validation functions
 def validate_route_text(value, field_name):
     # Check that route text fields such as origin and destination are not empty.
     if not isinstance(value, str) or not value.strip():
         print(f"Invalid {field_name}: {field_name} cannot be empty.")
+def validate_trip_date(date_str):
+    # Validate that the date is in YYYY-MM-DD format and is not in the past.
+    from datetime import datetime, date
+
+    try:
+        trip_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        print("Invalid date: must be in YYYY-MM-DD format.")
+        return False
+
+    if trip_date < date.today():
+        print("Invalid date: trip date cannot be in the past.")
         return False
 
     return True
@@ -114,6 +122,15 @@ def validate_distance(distance_km):
 
     if distance_km <= 0:
         print("Invalid distance: distance must be greater than 0.")
+
+def validate_time_format(time_str):
+    # Validate that a time string is in HH:MM 24-hour format.
+    from datetime import datetime
+
+    try:
+        datetime.strptime(time_str, "%H:%M")
+    except ValueError:
+        print("Invalid time: must be in HH:MM format (24-hour).")
         return False
 
     return True
@@ -126,6 +143,36 @@ def validate_fare(base_fare):
 
     if base_fare < 0:
         print("Invalid fare: fare cannot be negative.")
+        return False
+
+    return True
+
+def validate_departure_and_arrival(departure_time, arrival_time):
+    # Both times must individually be valid, and arrival must come after departure.
+    from datetime import datetime
+
+    if not validate_time_format(departure_time):
+        return False
+
+    if not validate_time_format(arrival_time):
+        return False
+
+    # Compare as actual time objects, not raw strings, so "8:00" vs "12:00"
+    # compares correctly regardless of zero-padding
+    dep = datetime.strptime(departure_time, "%H:%M")
+    arr = datetime.strptime(arrival_time, "%H:%M")
+
+    if arr <= dep:
+        print("Invalid times: arrival time must be after departure time.")
+        return False
+
+    return True
+
+
+def validate_total_seats(total_seats):
+    # Reuses the existing positive-integer check. Seats must be a real positive whole number.
+    if not validate_positive_int(total_seats):
+        print("Invalid seat count: total seats must be a positive whole number.")
         return False
 
     return True
