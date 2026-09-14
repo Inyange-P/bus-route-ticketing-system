@@ -15,7 +15,29 @@ def route_menu():
 
         choice = input("Enter your choice: ")
 
-        if choice == "0":
+        if choice == "1":
+            origin = input("Enter origin: ")
+            destination = input("Enter destination: ")
+
+            try:
+                distance_km = float(input("Enter distance in km: "))
+                base_fare = float(input("Enter base fare: "))
+
+                route = route_manager.add_route(
+                    origin,
+                    destination,
+                    distance_km,
+                    base_fare
+                )
+
+                if route is not None:
+                    print("Route added successfully.")
+                    print(route)
+
+            except ValueError:
+                print("Invalid number entered.")
+
+        elif choice == "0":
             break
 
         else:
