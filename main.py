@@ -52,6 +52,41 @@ def route_menu():
                 for route in results:
                     print(route)
 
+        elif choice == "4":
+            try:
+                route_id = int(input("Enter route ID to update: "))
+
+                origin = input("Enter new origin (leave blank to keep current): ")
+                destination = input("Enter new destination (leave blank to keep current): ")
+                distance_input = input("Enter new distance in km (leave blank to keep current): ")
+                fare_input = input("Enter new base fare (leave blank to keep current): ")
+
+                distance_km = None
+                base_fare = None
+
+                if distance_input:
+                    distance_km = float(distance_input)
+
+                if fare_input:
+                    base_fare = float(fare_input)
+
+                updated_route = route_manager.update_route(
+                    route_id,
+                    origin if origin else None,
+                    destination if destination else None,
+                    distance_km,
+                    base_fare
+                )
+
+                if updated_route is None:
+                    print("Route not found or invalid information entered.")
+                else:
+                    print("Route updated successfully.")
+                    print(updated_route)
+
+            except ValueError:
+                print("Invalid number entered.")
+
         elif choice == "0":
             break
 
