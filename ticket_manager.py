@@ -2,6 +2,11 @@ from datetime import date, datetime
 import math
 
 from ticket import Ticket
+from utils.validation import (
+    validate_positive_int,
+    validate_record_exists,
+    validate_seat_number,
+)
 
 
 class TicketManager:
@@ -36,6 +41,7 @@ class TicketManager:
             return 1
 
         return max(self.tickets.keys()) + 1
+
     def calculate_ticket_price(self, base_fare, pass_type=None):
 # Start with the normal route fare. If there is no valid pass, the passenger pays the full fare.
 
@@ -67,23 +73,24 @@ class TicketManager:
             discount = self.STUDENT_DISCOUNT_RATE
 
             if not 0 <= discount < 1:
-              raise ValueError( "Student discount rate must be between 0 and 1." )
+                raise ValueError( "Student discount rate must be between 0 and 1." )
 
             return round(
-              float(base_fare) * (1 - discount), 2 )
+                float(base_fare) * (1 - discount), 2 )
+
         raise ValueError( f"Unsupported pass type: {pass_type}." )
 
     def search_ticket(self, ticket_id):
-# Search for a ticket using its ID. Return the ticket if found.
+# Search for a ticket using its ID. Returns the ticket if it exists, or None if it doesn't. Not finding a ticket isn't treated as an error here, it's a normal result, the staff member just tries a different ID.
 
-# In Python, bool is technically a subclass of int, so isinstance(True, int) is True.  Without this extra check, someone could accidentally search using True/False and it would silently be treated as 1/0 instead of being rejected as invalid input.
-     if isinstance(ticket_id, bool) or not isinstance(ticket_id, int):
-        raise TypeError("Ticket ID must be an integer.")
+# We use the shared validate_positive_int() helper from utils/validation.py instead of writing our own isinstance checks here, since every module on the team needs this
+# exact same "is this a real positive whole number" check for its own IDs.
+      if isinstance(ticket_id, bool) or not isinstance(ticket_id, int):
+        raise TypeError("Ticket ID must be a positive integer.")
 
-     if ticket_id <= 0:
-        raise ValueError("Ticket ID must be greater than zero.")
-
-     return self.tickets.get(ticket_id)
+      if ticket_id <= 0:
+        raise ValueError("Ticket ID must be a positive integer.")
+      return self.tickets.get(ticket_id)
 
     def display_all_tickets(self):
 # Show all tickets in the system.
@@ -124,7 +131,7 @@ class TicketManager:
             print("No cancelled tickets found.")
 
     def cancel_ticket(self, ticket_id):
-# Cancel a ticket. The ticket stays in the system but its status changes.
+# Cancel a ticket. The ticket stays in the system but its status changes. This reuses search_ticket instead of writing a second lookup, so it also gets the same ID checking for free.
 
         ticket = self.search_ticket(ticket_id)
 
@@ -147,15 +154,8 @@ class TicketManager:
     def get_tickets_by_passenger(self, passenger_id):
 # Return all tickets belonging to one passenger.
 
-        if isinstance(passenger_id, bool) or not isinstance(passenger_id, int):
-            raise TypeError(
-                "Passenger ID must be an integer."
-            )
-
-        if passenger_id <= 0:
-            raise ValueError(
-                "Passenger ID must be greater than zero."
-            )
+        if not validate_positive_int(passenger_id):
+            raise TypeError("Passenger ID must be a positive integer.")
 
         passenger_tickets = []
 
@@ -168,15 +168,8 @@ class TicketManager:
     def get_tickets_by_trip(self, trip_id):
 # Return all tickets for one trip.
 
-        if isinstance(trip_id, bool) or not isinstance(trip_id, int):
-            raise TypeError(
-                "Trip ID must be an integer."
-            )
-
-        if trip_id <= 0:
-            raise ValueError(
-                "Trip ID must be greater than zero."
-            )
+        if not validate_positive_int(trip_id):
+            raise TypeError("Trip ID must be a positive integer.")
 
         trip_tickets = []
 
@@ -187,7 +180,8 @@ class TicketManager:
         return trip_tickets
 
     def seat_is_taken(self, trip_id, seat_number):
-# Check whether a seat is already occupied.
+# Check whether a seat is already occupied. This one stays here instead of moving to utils/validation.py, because it depends on our own ticket records (self.tickets), not on some general rule everyone can
+# reuse the same way. Only cancelled tickets are ignored on purpose, so cancelling a ticket automatically frees the seat back up with no extra code needed anywhere else.
 
         for ticket in self.tickets.values():
 
@@ -201,7 +195,7 @@ class TicketManager:
         return False
 
     def count_active_tickets(self, trip_id):
-# Count how many active tickets exist for a trip.
+# Count how many active tickets exist for a trip. Same reasoning as seat_is_taken right above, this needs our own ticket records so it stays a method here rather than becoming a shared utility.
 
         count = 0
 
@@ -214,48 +208,35 @@ class TicketManager:
                 count += 1
 
         return count
+
     def _validate_passenger(self, passenger_id, passengers):
 # A ticket cannot be issued to a passenger, who is not registered in the system.
 
-        if isinstance(passenger_id, bool) or not isinstance( passenger_id, int ):
-            raise TypeError("Passenger ID must be an integer.")
-
-        if passenger_id <= 0:
-            raise ValueError( "Passenger ID must be greater than zero." )
+        if not validate_positive_int(passenger_id):
+            raise TypeError("Passenger ID must be a positive integer.")
 
         if passengers is None:
             raise ValueError( "Passenger information is not available." )
 
-        if not hasattr(passengers, "get"):
-            raise TypeError( "Passenger records must support ID lookup." )
-
-        passenger = passengers.get(passenger_id)
-
-        if passenger is None:
+# validate_record_exists() checks both that "passengers" actually supports a lookup (like a dictionary does) AND that this specific ID is in there, so we don't need two separate checks like we used to.
+        if not validate_record_exists(passenger_id, passengers):
             raise ValueError( f"Passenger ID {passenger_id} does not exist." )
 
-        return passenger
+        return passengers.get(passenger_id)
+
     def _validate_trip(self, trip_id, trips):
 # The selected trip must exist before a ticket can be sold.
 
-        if isinstance(trip_id, bool) or not isinstance( trip_id, int ):
-            raise TypeError("Trip ID must be an integer.")
-
-        if trip_id <= 0:
-            raise ValueError( "Trip ID must be greater than zero." )
+        if not validate_positive_int(trip_id):
+            raise TypeError("Trip ID must be a positive integer.")
 
         if trips is None:
             raise ValueError( "Trip information is not available." )
 
-        if not hasattr(trips, "get"):
-            raise TypeError( "Trip records must support ID lookup." )
-
-        trip = trips.get(trip_id)
-
-        if trip is None:
+        if not validate_record_exists(trip_id, trips):
             raise ValueError( f"Trip ID {trip_id} does not exist." )
 
-        return trip
+        return trips.get(trip_id)
 
     def _validate_trip_information(self, trip):
 # The ticket system depends on these values from Trip. Check them before using them so bad trip data does not cause confusing errors later.
@@ -263,11 +244,8 @@ class TicketManager:
         if not hasattr(trip, "route_id"):
             raise AttributeError( "Trip is missing route_id." )
 
-        if not isinstance(trip.route_id, int) or isinstance( trip.route_id, bool ):
-            raise TypeError( "Trip route_id must be an integer." )
-
-        if trip.route_id <= 0:
-            raise ValueError( "Trip route_id must be greater than zero." )
+        if not validate_positive_int(trip.route_id):
+            raise TypeError( "Trip route_id must be a positive integer." )
 
         if not hasattr(trip, "travel_date"):
             raise AttributeError( "Trip is missing travel_date." )
@@ -278,14 +256,8 @@ class TicketManager:
         if not hasattr(trip, "total_seats"):
             raise AttributeError( "Trip is missing total_seats." )
 
-        if (
-            isinstance(trip.total_seats, bool)
-            or not isinstance(trip.total_seats, int)
-        ):
-            raise TypeError( "Trip total_seats must be an integer." )
-
-        if trip.total_seats <= 0:
-            raise ValueError( "Trip must have at least one seat." )
+        if not validate_positive_int(trip.total_seats):
+            raise TypeError( "Trip total_seats must be a positive integer." )
 
     def _get_route_for_trip(self, trip, routes):
 # The trip tells us which route it belongs to. We need the route to get the base fare.
@@ -293,13 +265,10 @@ class TicketManager:
         if routes is None:
             raise ValueError( "Route information is not available." )
 
-        if not hasattr(routes, "get"):
-            raise TypeError( "Route records must support ID lookup." )
+        if not validate_record_exists(trip.route_id, routes):
+            raise ValueError( f"Route ID {trip.route_id} does not exist." )
 
         route = routes.get(trip.route_id)
-
-        if route is None:
-            raise ValueError( f"Route ID {trip.route_id} does not exist." )
 
         if not hasattr(route, "base_fare"):
             raise AttributeError( "Route is missing base_fare." )
@@ -307,21 +276,14 @@ class TicketManager:
         return route
 
     def _validate_seat_for_purchase( self, trip_id, seat_number, trip ):
-# A seat number must be a real positive whole number.
+# A seat number must be a real positive whole number, and it also has to
+# actually exist on this bus. validate_seat_number() checks both of those
+# in one go, so we don't need to check the number's type and its range separately.
 
-        if isinstance(seat_number, bool) or not isinstance( seat_number, int ):
-            raise TypeError( "Seat number must be an integer." )
-
-        if seat_number <= 0:
-            raise ValueError( "Seat number must be greater than zero." )
-
-        total_seats = trip.total_seats
-
-# The seat must actually exist on this bus.
-        if seat_number > total_seats:
+        if not validate_seat_number(seat_number, trip.total_seats):
             raise ValueError(
                 f"Seat {seat_number} does not exist. "
-                f"Choose a seat from 1 to {total_seats}." )
+                f"Choose a seat from 1 to {trip.total_seats}." )
 
 # Only active tickets occupy seats. A cancelled ticket should free its old seat.
         if self.seat_is_taken(trip_id, seat_number):
@@ -330,7 +292,7 @@ class TicketManager:
 # This protects against corrupted data where the number of active tickets has somehow reached the bus capacity.
         active_tickets = self.count_active_tickets(trip_id)
 
-        if active_tickets >= total_seats:
+        if active_tickets >= trip.total_seats:
             raise ValueError( "This trip is full. No seats are available." )
 
     def _get_pass_for_purchase( self, passenger_id, pass_id, passes, travel_date ):
@@ -338,22 +300,16 @@ class TicketManager:
         if pass_id is None:
             return None
 
-        if isinstance(pass_id, bool) or not isinstance( pass_id, int ):
-            raise TypeError( "Pass ID must be an integer." )
-
-        if pass_id <= 0:
-            raise ValueError( "Pass ID must be greater than zero." )
+        if not validate_positive_int(pass_id):
+            raise TypeError( "Pass ID must be a positive integer." )
 
         if passes is None:
             raise ValueError( "Bus pass information is not available." ) 
 
-        if not hasattr(passes, "get"):
-            raise TypeError( "Bus pass records must support ID lookup." )
+        if not validate_record_exists(pass_id, passes):
+            raise ValueError( f"Pass ID {pass_id} does not exist." )
 
         bus_pass = passes.get(pass_id)
-
-        if bus_pass is None:
-            raise ValueError( f"Pass ID {pass_id} does not exist." )
 
         if not hasattr(bus_pass, "passenger_id"):
             raise AttributeError( "Bus pass is missing passenger_id." )
@@ -429,7 +385,7 @@ class TicketManager:
             final_price = self.calculate_ticket_price( base_fare, valid_pass.pass_type )
 
             if not hasattr(valid_pass, "pass_id"):
-             raise AttributeError( "Bus pass is missing pass_id." )
+                raise AttributeError( "Bus pass is missing pass_id." )
             used_pass_id = valid_pass.pass_id
 
 # Generate the ID only after all validation has succeeded. This means failed purchases do not create unnecessary IDs.
@@ -442,5 +398,3 @@ class TicketManager:
         self.add_ticket(ticket)
 
         return ticket
-
-   

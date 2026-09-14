@@ -1,6 +1,7 @@
 # Shared file handling functions for the bus route and ticket management system
-# Chinelo's section: Passenger and BusPass saving/loding
 
+from datetime import date
+from ticket import Ticket
 import json
 from passenger import Passenger
 from bus_pass import BusPass
@@ -75,4 +76,52 @@ def load_bus_passes(filename="bus_passes.json"):
 
     print(f"Loaded {len(bus_passes)} bus pass(es) from {filename}.")
     return bus_passes
+
+
+# with .isoformat() before it can go into JSON, and converted back with date.fromisoformat() when loading. JSON itself has no idea what a date object is, so this step can't be skipped or it will crash on save.
+
+def save_tickets(tickets, filename="tickets.json"):
+    # convert each Ticket object into a plain dictionary so it can be saved as JSON
+    data = []
+    for ticket in tickets.values():
+        data.append({
+            "ticket_id": ticket.ticket_id,
+            "passenger_id": ticket.passenger_id,
+            "trip_id": ticket.trip_id,
+            "seat_number": ticket.seat_number,
+            "pass_id": ticket.pass_id,
+            "price": ticket.price,
+            "purchase_date": ticket.purchase_date.isoformat(),
+            "status": ticket.status
+        })
+    with open(filename, "w") as file:
+        json.dump(data, file, indent=4)
+
+    print(f"Saved {len(data)} ticket(s) to {filename}.")
+
+def load_tickets(filename="tickets.json"):
+    tickets = {}
+
+    try:
+        with open(filename, "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        print(f"No saved file found at {filename}. Starting with no tickets.")
+        return tickets
+
+    for item in data:
+        ticket = Ticket(
+            ticket_id=item["ticket_id"],
+            passenger_id=item["passenger_id"],
+            trip_id=item["trip_id"],
+            seat_number=item["seat_number"],
+            price=item["price"],
+            pass_id=item["pass_id"],
+            purchase_date=date.fromisoformat(item["purchase_date"]),
+            status=item["status"]
+        )
+        tickets[ticket.ticket_id] = ticket
+
+    print(f"Loaded {len(tickets)} ticket(s) from {filename}.")
+    return tickets
 
