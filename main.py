@@ -40,6 +40,18 @@ def route_menu():
         elif choice == "2":
             route_manager.display_routes()
 
+        elif choice == "3":
+            destination = input("Enter destination to search: ")
+
+            results = route_manager.search_routes(destination)
+
+            if not results:
+                print("No matching routes found.")
+            else:
+                print("\n----- MATCHING ROUTES -----")
+                for route in results:
+                    print(route)
+
         elif choice == "0":
             break
 
