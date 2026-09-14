@@ -1,0 +1,45 @@
+from route_manager import RouteManager
+from utils.file_handler import load_routes, save_routes
+
+route_manager = RouteManager()
+
+def route_menu():
+    while True:
+        print("\n----- ROUTE MENU -----")
+        print("1. Add route")
+        print("2. Display routes")
+        print("3. Search route")
+        print("4. Update route")
+        print("5. Delete route")
+        print("0. Back")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "0":
+            break
+
+        else:
+            print("Feature coming next.")
+
+
+def main():
+    while True:
+        print("\n===== BUS ROUTE AND TICKETING SYSTEM =====")
+        print("1. Route Management")
+        print("0. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            route_menu()
+
+        elif choice == "0":
+            print("Exiting system.")
+            break
+
+        else:
+            print("Invalid choice.")
+
+
+if __name__ == "__main__":
+    main()
