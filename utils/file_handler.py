@@ -6,6 +6,7 @@ import json
 from passenger import Passenger
 from bus_pass import BusPass
 from trip import Trip
+from route import Route
 
 def save_passengers(passengers, filename="passengers.json"):
     # convert each Passenger object into a plain dictionary so it can be saved as JSON
@@ -172,3 +173,41 @@ def load_trips(filename="trips.json"):
     print(f"Loaded {len(trips)} trip(s) from {filename}.")
     return trips
 
+def save_routes(route_manager, filename="routes.json"):
+    routes_data = []
+
+    for route in route_manager.routes.values():
+        routes_data.append({
+            "route_id": route.route_id,
+            "origin": route.origin,
+            "destination": route.destination,
+            "distance_km": route.distance_km,
+            "base_fare": route.base_fare
+        })
+
+    with open(filename, "w") as file:
+        json.dump(routes_data, file, indent=4)
+
+    print(f"Saved {len(routes_data)} route(s) to {filename}.")
+
+
+def load_routes(route_manager, filename="routes.json"):
+    try:
+        with open(filename, "r") as file:
+            routes_data = json.load(file)
+
+        for route_data in routes_data:
+            route = Route(
+                route_data["route_id"],
+                route_data["origin"],
+                route_data["destination"],
+                route_data["distance_km"],
+                route_data["base_fare"]
+            )
+
+            route_manager.routes[route.route_id] = route
+
+        print(f"Loaded {len(routes_data)} route(s) from {filename}.")
+
+    except FileNotFoundError:
+        print(f"{filename} not found. Starting with no saved routes.")

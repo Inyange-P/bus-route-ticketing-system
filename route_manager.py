@@ -1,4 +1,9 @@
 from route import Route
+from utils.validation import (
+    validate_route_text,
+    validate_distance,
+    validate_fare
+)
 
 class RouteManager:
     #Manages all routes in the system. 
@@ -15,6 +20,19 @@ class RouteManager:
         return max(self.routes.keys()) + 1
 
     def add_route(self, origin, destination, distance_km, base_fare):
+        # Validate route information before creating the route.
+        if not validate_route_text(origin, "origin"):
+            return None
+
+        if not validate_route_text(destination, "destination"):
+            return None
+
+        if not validate_distance(distance_km):
+            return None
+
+        if not validate_fare(base_fare):
+            return None
+
         # Generate a new ID for the route.
         route_id = self.generate_route_id()
 
@@ -27,7 +45,7 @@ class RouteManager:
             base_fare
         )
 
-        #store the route using its ID.
+        # Store the route using its ID.
         self.routes[route_id] = route
 
         return route
@@ -52,6 +70,7 @@ class RouteManager:
 
         return matches
 
+
     def update_route(
             self,
             route_id,
@@ -59,20 +78,39 @@ class RouteManager:
             destination=None,
             distance_km=None,
             base_fare=None
-    ):
-        # check if th e route exists
+        ):
+        # Check if the route exists.
         if route_id not in self.routes:
             return None
 
+        # Validate any new values before updating the route.
+        if origin is not None:
+            if not validate_route_text(origin, "origin"):
+                return None
+
+        if destination is not None:
+            if not validate_route_text(destination, "destination"):
+                return None
+
+        if distance_km is not None:
+            if not validate_distance(distance_km):
+                return None
+
+        if base_fare is not None:
+            if not validate_fare(base_fare):
+                return None
+
         route = self.routes[route_id]
 
-        # update the route attributes if provided
         if origin is not None:
             route.origin = origin
+
         if destination is not None:
             route.destination = destination
+
         if distance_km is not None:
             route.distance_km = distance_km
+
         if base_fare is not None:
             route.base_fare = base_fare
 

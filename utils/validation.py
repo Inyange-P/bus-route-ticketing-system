@@ -93,6 +93,41 @@ def validate_seat_number(seat_number, total_seats):
 
     return seat_number <= total_seats
 
+# Abigail's section: Route validation functions
+def validate_route_text(value, field_name):
+    # Check that route text fields such as origin and destination are not empty.
+    if not isinstance(value, str) or not value.strip():
+        print(f"Invalid {field_name}: {field_name} cannot be empty.")
+        return False
+
+    return True
+
+def validate_distance(distance_km):
+    # Distance must be a number greater than zero.
+    if not isinstance(distance_km, (int, float)) or isinstance(distance_km, bool):
+        print("Invalid distance: distance must be a number.")
+        return False
+
+    if distance_km <= 0:
+        print("Invalid distance: distance must be greater than 0.")
+        return False
+    
+    return True
+
+def validate_fare(base_fare):
+    # Fare must be a number and cannot be negative.
+    if not isinstance(base_fare, (int, float)) or isinstance(base_fare, bool):
+        print("Invalid fare: fare must be a number.")
+        return False
+
+    if base_fare < 0:
+        print("Invalid fare: fare cannot be negative.")
+        return False
+
+    return True
+
+
+# Moses's section: Trip validation functions
 def validate_trip_date(date_str):
     # Validate that the date is in YYYY-MM-DD format and is not in the past.
     from datetime import datetime, date
@@ -109,7 +144,6 @@ def validate_trip_date(date_str):
 
     return True
 
-
 def validate_time_format(time_str):
     # Validate that a time string is in HH:MM 24-hour format.
     from datetime import datetime
@@ -121,7 +155,6 @@ def validate_time_format(time_str):
         return False
 
     return True
-
 
 def validate_departure_and_arrival(departure_time, arrival_time):
     # Both times must individually be valid, and arrival must come after departure.
@@ -143,7 +176,6 @@ def validate_departure_and_arrival(departure_time, arrival_time):
         return False
 
     return True
-
 
 def validate_total_seats(total_seats):
     # Reuses the existing positive-integer check. Seats must be a real positive whole number.
