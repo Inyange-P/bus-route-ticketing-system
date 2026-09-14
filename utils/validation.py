@@ -1,6 +1,8 @@
 # Shared validation functions for the bus route and ticket management system
 # Chinelo's section: Passenger and BusPass validation functions
 
+from datetime import datetime, date
+
 def validate_name(name):
     # Validate that the name is a non-empty string.
     if not name or not name.strip():
@@ -59,3 +61,13 @@ def validate_status(status):
         print(f"Invalid status: must be one of {valid_statuses}.")
         return False
     return True
+
+def parse_date(value):
+    # converts a string, datetime, or date into a plain date object.
+    if isinstance(value, str):
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    raise ValueError(f"Cannot parse date from value: {value}")
