@@ -1,5 +1,4 @@
 # Shared validation functions for the bus route and ticket management system
-# Chinelo's section: Passenger and BusPass validation functions
 
 def validate_name(name):
     # Validate that the name is a non-empty string.
@@ -94,9 +93,6 @@ def validate_seat_number(seat_number, total_seats):
 
     return seat_number <= total_seats
 
-
-# Moses's section: Trip validation functions
-
 def validate_trip_date(date_str):
     # Validate that the date is in YYYY-MM-DD format and is not in the past.
     from datetime import datetime, date
@@ -150,8 +146,7 @@ def validate_departure_and_arrival(departure_time, arrival_time):
 
 
 def validate_total_seats(total_seats):
-    # Reuses the existing positive-integer check. Seats must be a real
-    # positive whole number.
+    # Reuses the existing positive-integer check. Seats must be a real positive whole number.
     if not validate_positive_int(total_seats):
         print("Invalid seat count: total seats must be a positive whole number.")
         return False
