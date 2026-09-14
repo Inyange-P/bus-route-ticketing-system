@@ -1,58 +1,48 @@
 from route_manager import RouteManager
 
-manager = RouteManager()
+def test_add_valid_route():
+    manager = RouteManager()
 
-print("Adding a valid route:")
-route = manager.add_route(
-    "Pamplemousses",
-    "Port Louis",
-    17,
-    40
-)
-print(route)
+    route = manager.add_route("Pamplemousses", "Port Louis", 17, 40)
 
-print("\nTrying to add a route with an empty origin:")
-route = manager.add_route(
-    "",
-    "Bagatelle",
-    12,
-    30
-)
-print(route)
+    assert route is not None
+    assert manager.routes == {1: route}
 
-print("\nTrying to add a route with an empty destination:")
-route = manager.add_route(
-    "Port Louis",
-    "",
-    12,
-    30
-)
-print(route)
+def test_add_route_rejects_empty_origin():
+    manager = RouteManager()
 
-print("\nTrying to add a route with invalid distance:")
-route = manager.add_route(
-    "Port Louis",
-    "Bagatelle",
-    -5,
-    30
-)
-print(route)
+    assert manager.add_route("", "Bagatelle", 12, 30) is None
+    assert manager.routes == {}
+    assert manager.generate_route_id() == 1
 
-print("\nTrying to add a route with negative fare:")
-route = manager.add_route(
-    "Port Louis",
-    "Bagatelle",
-    12,
-    -10
-)
-print(route)
+def test_add_route_rejects_empty_destination():
+    manager = RouteManager()
 
-print("\nTrying to update a route with an invalid destination:")
-updated_route = manager.update_route(
-    route_id=1,
-    destination=""
-)
-print(updated_route)
+    assert manager.add_route("Port Louis", "", 12, 30) is None
+    assert manager.routes == {}
+    assert manager.generate_route_id() == 1
 
-print("\nChecking that the original route was not changed:")
-print(manager.routes[1])
+def test_add_route_rejects_negative_distance():
+    manager = RouteManager()
+
+    assert manager.add_route("Port Louis", "Bagatelle", -5, 30) is None
+    assert manager.routes == {}
+    assert manager.generate_route_id() == 1
+
+def test_add_route_rejects_negative_fare():
+    manager = RouteManager()
+
+    assert manager.add_route("Port Louis", "Bagatelle", 12, -10) is None
+    assert manager.routes == {}
+    assert manager.generate_route_id() == 1
+
+def test_invalid_update_leaves_original_route_unchanged():
+    manager = RouteManager()
+    route = manager.add_route("Pamplemousses", "Port Louis", 17, 40)
+
+    assert manager.update_route(1, destination="") is None
+    assert manager.routes == {1: route}
+    assert route.origin == "Pamplemousses"
+    assert route.destination == "Port Louis"
+    assert route.distance_km == 17
+    assert route.base_fare == 40
