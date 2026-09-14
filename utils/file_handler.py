@@ -5,6 +5,7 @@ from ticket import Ticket
 import json
 from passenger import Passenger
 from bus_pass import BusPass
+from trip import Trip
 
 def save_passengers(passengers, filename="passengers.json"):
     # convert each Passenger object into a plain dictionary so it can be saved as JSON
@@ -124,4 +125,50 @@ def load_tickets(filename="tickets.json"):
 
     print(f"Loaded {len(tickets)} ticket(s) from {filename}.")
     return tickets
+
+
+
+def save_trips(trips, filename="trips.json"):
+    # Convert each Trip object into a plain dictionary so it can be saved as JSON.
+    # travel_date is a real date object, so it needs .isoformat() before
+    # it can go into JSON — same reason tickets do this for purchase_date.
+    data = []
+    for trip in trips.values():
+        data.append({
+            "trip_id": trip.trip_id,
+            "route_id": trip.route_id,
+            "travel_date": trip.travel_date.isoformat(),
+            "departure_time": trip.departure_time,
+            "arrival_time": trip.arrival_time,
+            "total_seats": trip.total_seats
+        })
+    with open(filename, "w") as file:
+        json.dump(data, file, indent=4)
+
+    print(f"Saved {len(data)} trip(s) to {filename}.")
+
+
+def load_trips(filename="trips.json"):
+    trips = {}
+
+    try:
+        with open(filename, "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        print(f"No saved file found at {filename}. Starting with no trips.")
+        return trips
+
+    for item in data:
+        trip = Trip(
+            trip_id=item["trip_id"],
+            route_id=item["route_id"],
+            travel_date=date.fromisoformat(item["travel_date"]),
+            departure_time=item["departure_time"],
+            arrival_time=item["arrival_time"],
+            total_seats=item["total_seats"]
+        )
+        trips[trip.trip_id] = trip
+
+    print(f"Loaded {len(trips)} trip(s) from {filename}.")
+    return trips
 
