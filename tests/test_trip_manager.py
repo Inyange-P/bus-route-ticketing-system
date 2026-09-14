@@ -4,11 +4,6 @@ from trip_manager import TripManager
 
 
 class FakeTicketManager:
-    """
-    A stand-in for Providence's TicketManager, used only for testing.
-    Lets us control exactly which seats are "taken" without needing
-    real Ticket objects or her full purchase logic.
-    """
 
     def __init__(self, taken_seats=None):
         # taken_seats: a set of (trip_id, seat_number) tuples

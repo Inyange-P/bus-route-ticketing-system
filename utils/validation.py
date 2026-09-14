@@ -59,3 +59,37 @@ def validate_status(status):
         print(f"Invalid status: must be one of {valid_statuses}.")
         return False
     return True
+
+def validate_positive_int(value):
+    # Returns True only for a real positive whole number. 
+    # In Python, bool is technically a subclass of int, so isinstance(True, int) is True. Without checking for bool separately, True/False could slip through and be mistaken for 1/0 wherever an ID or count is expected.
+    if isinstance(value, bool):
+        return False
+
+    if not isinstance(value, int):
+        return False
+
+    return value > 0
+
+
+def validate_record_exists(record_id, records):
+    # Returns True if "records" is a dict-like collection (something that supports .get()) and it actually contains an entry for record_id. 
+    # This one function covers "trip must exist", "passenger must exist", "route must exist", and "pass must exist" -- anywhere in the project where we're checking "is this ID present in this lookup table."
+    if records is None:
+        return False
+
+    if not hasattr(records, "get"):
+        return False
+
+    return records.get(record_id) is not None
+
+
+def validate_seat_number(seat_number, total_seats):
+# Returns True if seat_number is a real positive integer that actually fits within the bus's seat range (1 up to total_seats).
+    if not validate_positive_int(seat_number):
+        return False
+
+    if not validate_positive_int(total_seats):
+        return False
+
+    return seat_number <= total_seats
