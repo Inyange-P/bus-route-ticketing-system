@@ -1,0 +1,42 @@
+[
+    {
+        "ticket_id": 1,
+        "passenger_id": 101,
+        "trip_id": 1,
+        "seat_number": 5,
+        "pass_id": null,
+        "price": 50,
+        "purchase_date": "2026-09-15",
+        "status": "cancelled"
+    },
+    {
+        "ticket_id": 2,
+        "passenger_id": 1,
+        "trip_id": 1,
+        "seat_number": 20,
+        "pass_id": null,
+        "price": 40.0,
+        "purchase_date": "2026-09-15",
+        "status": "active"
+    },
+    {
+        "ticket_id": 3,
+        "passenger_id": 4,
+        "trip_id": 1,
+        "seat_number": 6,
+        "pass_id": 2,
+        "price": 20.0,
+        "purchase_date": "2026-09-15",
+        "status": "active"
+    },
+    {
+        "ticket_id": 4,
+        "passenger_id": 3,
+        "trip_id": 1,
+        "seat_number": 8,
+        "pass_id": null,
+        "price": 40.0,
+        "purchase_date": "2026-09-15",
+        "status": "active"
+    }
+]

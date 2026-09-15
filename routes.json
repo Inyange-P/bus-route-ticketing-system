@@ -1,0 +1,37 @@
+[
+    {
+        "route_id": 1,
+        "origin": "Pamplemousses",
+        "destination": "Port Louis",
+        "distance_km": 17,
+        "base_fare": 40
+    },
+    {
+        "route_id": 2,
+        "origin": "Port Louis",
+        "destination": "Bagatelle",
+        "distance_km": 10,
+        "base_fare": 30
+    },
+    {
+        "route_id": 3,
+        "origin": "Pam",
+        "destination": "PL",
+        "distance_km": 12.0,
+        "base_fare": 25.0
+    },
+    {
+        "route_id": 4,
+        "origin": "Pamplemousses",
+        "destination": "Port Louis",
+        "distance_km": 17.0,
+        "base_fare": 40.0
+    },
+    {
+        "route_id": 5,
+        "origin": "123",
+        "destination": "123",
+        "distance_km": 123.0,
+        "base_fare": 123.0
+    }
+]

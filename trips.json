@@ -1,0 +1,10 @@
+[
+    {
+        "trip_id": 1,
+        "route_id": 1,
+        "travel_date": "2026-09-20",
+        "departure_time": "09:00",
+        "arrival_time": "10:00",
+        "total_seats": 20
+    }
+]

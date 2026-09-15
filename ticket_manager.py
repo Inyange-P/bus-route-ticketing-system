@@ -6,6 +6,7 @@ from utils.validation import (
     validate_positive_int,
     validate_record_exists,
     validate_seat_number,
+    parse_date,
 )
 
 
@@ -316,7 +317,8 @@ class TicketManager:
 
 # A passenger must not be able to use another passenger's personalised pass.
         if bus_pass.passenger_id != passenger_id:
-            raise ValueError( "This bus pass does not belong to this passenger." )
+            print("This bus pass does not belong to this passenger. Full fare applies.")
+            return None
 
         if not hasattr(bus_pass, "pass_type"):
             raise AttributeError("Bus pass is missing pass_type." )
@@ -340,18 +342,16 @@ class TicketManager:
         if status != "active":
             return None
 
-        if not hasattr(bus_pass, "expiry_date"):
-            raise AttributeError( "Bus pass is missing expiry_date." )
+        try:
+            issue_date = parse_date(getattr(bus_pass, "issue_date", None))
+            expiry_date = parse_date(getattr(bus_pass, "expiry_date", None))
+            travel_date = parse_date(travel_date)
+        except ValueError:
+            print("Invalid pass dates. Full fare applies.")
+            return None
 
-        expiry_date = bus_pass.expiry_date
-
-        if isinstance(expiry_date, str):
-            expiry_date = date.fromisoformat(expiry_date)
-        elif not isinstance(expiry_date, date):
-            raise TypeError( "Bus pass expiry_date must be a date or an ISO date string." )
-
-# An expired pass does not give a discount. The ticket can still be purchased at the normal fare.
-        if travel_date > expiry_date:
+# A pass is usable from its issue date through its expiry date, inclusive.
+        if not issue_date <= travel_date <= expiry_date:
             return None
 
 # The pass is valid for this trip.

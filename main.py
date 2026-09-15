@@ -101,8 +101,13 @@ def route_menu():
         elif choice == "5":
             try:
                 route_id = int(input("Enter route ID to delete: "))
+            except ValueError:
+                print("Invalid route ID entered.")
+                continue
 
-                result = route_manager.delete_route(route_id)
+            try:
+
+                result = route_manager.delete_route(route_id, trip_manager.trips)
 
                 if result:
                     print("Route deleted successfully.")
@@ -116,7 +121,7 @@ def route_menu():
             break
 
         else:
-            print("Feature coming next.")
+            print("Invalid choice.")
 
 
 def trip_menu():
@@ -171,8 +176,12 @@ def trip_menu():
             route_input = input("Enter route ID to search (leave blank to skip): ")
             date_input = input("Enter travel date to search, YYYY-MM-DD (leave blank to skip): ")
 
-            route_id = int(route_input) if route_input else None
-            travel_date = date.fromisoformat(date_input) if date_input else None
+            try:
+                route_id = int(route_input) if route_input else None
+                travel_date = date.fromisoformat(date_input) if date_input else None
+            except ValueError:
+                print("Invalid route ID or date. Use a numeric ID and YYYY-MM-DD.")
+                continue
 
             results = trip_manager.search_trips(route_id=route_id, travel_date=travel_date)
 
@@ -205,6 +214,16 @@ def trip_menu():
                         continue
                     travel_date = date.fromisoformat(date_input)
 
+                trip = trip_manager.trips.get(trip_id)
+                if trip is None:
+                    print("Trip not found.")
+                    continue
+                if not validate_departure_and_arrival(
+                    departure_time or trip.departure_time,
+                    arrival_time or trip.arrival_time
+                ):
+                    continue
+
                 updated = trip_manager.update_trip(
                     trip_id,
                     travel_date=travel_date,
@@ -223,6 +242,11 @@ def trip_menu():
         elif choice == "6":
             try:
                 trip_id = int(input("Enter trip ID to cancel: "))
+            except ValueError:
+                print("Invalid trip ID entered.")
+                continue
+
+            try:
                 result = trip_manager.cancel_trip(trip_id, ticket_manager)
 
                 if result:
@@ -326,7 +350,8 @@ def passenger_menu():
                     passenger_id,
                     pass_type,
                     issue_date,
-                    expiry_date
+                    expiry_date,
+                    passengers=passenger_manager.passengers
                 )
 
                 if bus_pass is not None:
@@ -402,6 +427,11 @@ def ticket_menu():
                 )
                 pass_id = int(pass_input) if pass_input else None
 
+            except ValueError:
+                print("Invalid number entered. IDs and seat numbers must be whole numbers.")
+                continue
+
+            try:
                 ticket = ticket_manager.purchase_ticket(
                     passenger_id=passenger_id,
                     trip_id=trip_id,
@@ -442,6 +472,11 @@ def ticket_menu():
         elif choice == "4":
             try:
                 ticket_id = int(input("Enter ticket ID to cancel: "))
+            except ValueError:
+                print("Invalid ticket ID entered.")
+                continue
+
+            try:
 
                 result = ticket_manager.cancel_ticket(ticket_id)
 

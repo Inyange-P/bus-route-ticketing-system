@@ -1,2 +1,7 @@
 __pycache__/
 *.json
+!/routes.json
+!/trips.json
+!/passengers.json
+!/bus_passes.json
+!/tickets.json

@@ -109,9 +109,13 @@ def validate_seat_number(seat_number, total_seats):
     return seat_number <= total_seats
 
 def validate_route_text(value, field_name):
-    # Check that route text fields such as origin and destination are not empty.
+    # Place names may include numbers, but must contain at least one letter.
     if not isinstance(value, str) or not value.strip():
         print(f"Invalid {field_name}: {field_name} cannot be empty.")
+        return False
+
+    if not any(character.isalpha() for character in value):
+        print(f"Invalid {field_name}: must contain at least one letter.")
         return False
 
     return True

@@ -1,4 +1,4 @@
-from utils.validation import validate_pass_type, validate_date_order, validate_status, parse_date
+from utils.validation import validate_pass_type, validate_date_order, validate_status, parse_date, validate_passenger_exists
 from datetime import datetime, date
 from bus_pass import BusPass
 
@@ -15,7 +15,12 @@ class BusPassManager:
         # otherwise, continue from the highest existing bus pass ID.
         return max(self.bus_passes.keys()) + 1
 
-    def issue_pass(self, passenger_id, pass_type, issue_date, expiry_date):
+    def issue_pass(self, passenger_id, pass_type, issue_date, expiry_date, passengers=None):
+        if passengers is None:
+            print("Cannot issue a pass: passenger records are required.")
+            return None
+        if not validate_passenger_exists(passenger_id, passengers):
+            return None
         if not validate_pass_type(pass_type):
             return None
         if not validate_date_order(issue_date, expiry_date):
@@ -51,43 +56,26 @@ class BusPassManager:
                 matches.append(bus_pass)
         return matches
 
-    def is_pass_valid(self, pass_id, travel_date):
-        # checks whether a bus pass can be used for a discount/free travel on the given date 
+    def is_pass_valid(self, pass_id, travel_date, passenger_id=None):
+        # Check status and both date boundaries; check ownership when supplied.
         if pass_id not in self.bus_passes:
-            return False, "Bus pass not found."
+            return False
 
         bus_pass = self.bus_passes[pass_id]
-
         if bus_pass.status != "active":
-            return False, "Bus pass is not active."
+            return False
+        if passenger_id is not None and bus_pass.passenger_id != passenger_id:
+            return False
 
-        try: 
+        try:
+            issue_date = parse_date(bus_pass.issue_date)
             expiry_date = parse_date(bus_pass.expiry_date)
             travel_date = parse_date(travel_date)
         except ValueError:
             print("Invalid date format.")
             return False
 
-        if travel_date > expiry_date:
-            return False
-
-        return True
-
-        # travel_date might come in as a string, or as a real date/datetime object.
-        if isinstance(travel_date, str):
-            travel_date = datetime.strptime(travel_date, "%Y-%m-%d").date()
-        elif isinstance(travel_date, datetime):
-            travel_date = travel_date.date()
-        elif isinstance(travel_date, date):
-            travel_date = travel_date
-        else:
-            print("Invalid travel date format.")
-            return False, "Invalid travel date format."
-
-        if travel_date > expiry_date:
-            return False, "Bus pass has expired."
-
-        return True, "Bus pass is valid."
+        return issue_date <= travel_date <= expiry_date
 
     def renew_pass(self, pass_id, new_expiry_date):
         if pass_id not in self.bus_passes:

@@ -1,0 +1,26 @@
+[
+    {
+        "pass_id": 1,
+        "passenger_id": 1,
+        "pass_type": "student",
+        "issue_date": "2026-01-01",
+        "expiry_date": "2027-01-01",
+        "status": "active"
+    },
+    {
+        "pass_id": 2,
+        "passenger_id": 4,
+        "pass_type": "student",
+        "issue_date": "2026-09-15",
+        "expiry_date": "2027-09-15",
+        "status": "active"
+    },
+    {
+        "pass_id": 3,
+        "passenger_id": 3,
+        "pass_type": "student",
+        "issue_date": "2026-01-01",
+        "expiry_date": "2026-09-18",
+        "status": "active"
+    }
+]

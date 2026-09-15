@@ -1,0 +1,27 @@
+[
+    {
+        "passenger_id": 1,
+        "name": "Chinelo Kanu",
+        "phone": "57712345"
+    },
+    {
+        "passenger_id": 2,
+        "name": "Moses Kolaan",
+        "phone": "58899221"
+    },
+    {
+        "passenger_id": 3,
+        "name": "Abigail Inyang",
+        "phone": "57712345"
+    },
+    {
+        "passenger_id": 4,
+        "name": "Chinelo Kanu",
+        "phone": "58899221"
+    },
+    {
+        "passenger_id": 5,
+        "name": "Test ",
+        "phone": "59900112"
+    }
+]
