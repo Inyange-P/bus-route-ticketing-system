@@ -239,6 +239,225 @@ def trip_menu():
         else:
             print("Invalid choice.")
 
+def passenger_menu():
+    while True:
+        print("\n----- PASSENGER / PASS MENU -----")
+        print("1. Register passenger")
+        print("2. Display passengers")
+        print("3. Search passenger")
+        print("4. Update passenger")
+        print("5. Issue pass")
+        print("6. Display passes")
+        print("7. Renew pass")
+        print("8. Suspend pass")
+        print("0. Back to the main menu")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            name = input("Enter passenger name: ")
+            phone = input("Enter passenger phone: ")
+
+            passenger = passenger_manager.register_passenger(name, phone)
+
+            if passenger is not None:
+                print("Passenger registered successfully.")
+                print(passenger)
+            else:
+                print("Could not register passenger.")
+
+        elif choice == "2":
+            passenger_manager.display_passengers()
+
+        elif choice == "3":
+            id_input = input("Enter passenger ID to search (leave blank to skip): ")
+            name_input = input("Enter name to search (leave blank to skip): ")
+            phone_input = input("Enter phone to search (leave blank to skip): ")
+
+            try:
+                passenger_id = int(id_input) if id_input else None
+            except ValueError:
+                print("Invalid passenger ID entered.")
+                continue
+
+            results = passenger_manager.search_passenger(
+                passenger_id=passenger_id,
+                name=name_input if name_input else None,
+                phone=phone_input if phone_input else None
+            )
+
+            if not results:
+                print("No matching passengers found.")
+            else:
+                print("\n----- MATCHING PASSENGERS -----")
+                for passenger in results:
+                    print(passenger)
+
+        elif choice == "4":
+            try:
+                passenger_id = int(input("Enter passenger ID to update: "))
+
+                name = input("Enter new name (leave blank to keep current): ")
+                phone = input("Enter new phone (leave blank to keep current): ")
+
+                updated = passenger_manager.update_passenger(
+                    passenger_id,
+                    name=name if name else None,
+                    phone=phone if phone else None
+                )
+
+                if updated is not None:
+                    print("Passenger updated successfully.")
+                    print(updated)
+
+            except ValueError:
+                print("Invalid passenger ID entered.")
+
+        elif choice == "5":
+            try:
+                passenger_id = int(input("Enter passenger ID: "))
+                pass_type = input(
+                    "Enter pass type (student/senior/priority): "
+                )
+                issue_date = input("Enter issue date (YYYY-MM-DD): ")
+                expiry_date = input("Enter expiry date (YYYY-MM-DD): ")
+
+                bus_pass = bus_pass_manager.issue_pass(
+                    passenger_id,
+                    pass_type,
+                    issue_date,
+                    expiry_date
+                )
+
+                if bus_pass is not None:
+                    print("Bus pass issued successfully.")
+                    print(bus_pass)
+
+            except ValueError:
+                print("Invalid passenger ID entered.")
+
+        elif choice == "6":
+            bus_pass_manager.display_passes()
+
+        elif choice == "7":
+            try:
+                pass_id = int(input("Enter pass ID to renew: "))
+                new_expiry_date = input(
+                    "Enter new expiry date (YYYY-MM-DD): "
+                )
+
+                renewed = bus_pass_manager.renew_pass(
+                    pass_id,
+                    new_expiry_date
+                )
+
+                if renewed is not None:
+                    print("Pass renewed successfully.")
+                    print(renewed)
+
+            except ValueError:
+                print("Invalid pass ID entered.")
+
+        elif choice == "8":
+            try:
+                pass_id = int(input("Enter pass ID to suspend: "))
+
+                suspended = bus_pass_manager.set_pass_status(
+                    pass_id,
+                    "suspended"
+                )
+
+                if suspended is not None:
+                    print("Pass suspended successfully.")
+                    print(suspended)
+
+            except ValueError:
+                print("Invalid pass ID entered.")
+
+        elif choice == "0":
+            break
+
+        else:
+            print("Invalid choice.")
+
+def ticket_menu():
+    while True:
+        print("\n----- TICKET MENU -----")
+        print("1. Purchase ticket")
+        print("2. Display tickets")
+        print("3. Search ticket")
+        print("4. Cancel ticket")
+        print("0. Back to the main menu")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            try:
+                passenger_id = int(input("Enter passenger ID: "))
+                trip_id = int(input("Enter trip ID: "))
+                seat_number = int(input("Enter seat number: "))
+
+                pass_input = input(
+                    "Enter bus pass ID, if any (leave blank to skip): "
+                )
+                pass_id = int(pass_input) if pass_input else None
+
+                ticket = ticket_manager.purchase_ticket(
+                    passenger_id=passenger_id,
+                    trip_id=trip_id,
+                    seat_number=seat_number,
+                    routes=route_manager.routes,
+                    passengers=passenger_manager.passengers,
+                    trips=trip_manager.trips,
+                    passes=bus_pass_manager.bus_passes,
+                    pass_id=pass_id
+                )
+
+                if ticket is not None:
+                    print("Ticket purchased successfully.")
+                    print(ticket)
+
+            except ValueError as error:
+                print(error)
+            except TypeError as error:
+                print(error)
+
+        elif choice == "2":
+            ticket_manager.display_all_tickets()
+
+        elif choice == "3":
+            try:
+                ticket_id = int(input("Enter ticket ID to search: "))
+
+                ticket = ticket_manager.search_ticket(ticket_id)
+
+                if ticket is None:
+                    print("No ticket found with that ID.")
+                else:
+                    print(ticket)
+
+            except (ValueError, TypeError):
+                print("Invalid ticket ID entered.")
+
+        elif choice == "4":
+            try:
+                ticket_id = int(input("Enter ticket ID to cancel: "))
+
+                result = ticket_manager.cancel_ticket(ticket_id)
+
+                if result:
+                    print("Ticket cancelled successfully.")
+
+            except ValueError as error:
+                print(error)
+            except TypeError:
+                print("Invalid ticket ID entered.")
+
+        elif choice == "0":
+            break
+
+        else:
+            print("Invalid choice.")
 def main():
     load_routes(route_manager)
     load_trips(trip_manager)
@@ -250,6 +469,8 @@ def main():
         print("\n===== BUS ROUTE AND TICKETING SYSTEM =====")
         print("1. Route Management")
         print("2. Trip Management")
+        print("3. Passenger / Pass Management")
+        print("4. Ticket Management")
         print("0. Exit")
 
         choice = input("Enter your choice: ")
@@ -260,9 +481,19 @@ def main():
         elif choice == "2":
             trip_menu()
 
+        elif choice == "3":
+            passenger_menu()
+
+        elif choice == "4":
+            ticket_menu()
+
         elif choice == "0":
             save_routes(route_manager)
             save_trips(trip_manager)
+            save_passengers(passenger_manager.passengers)
+            save_bus_passes(bus_pass_manager.bus_passes)
+            save_tickets(ticket_manager.tickets)
+
             print("Exiting system.")
             break
 
