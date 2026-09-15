@@ -91,3 +91,31 @@ Seat availability for a trip is not tracked separately — it is determined dire
 This means booking a seat and buying a ticket are the same action — there's no separate "reserve a seat" step that could get out of sync with actual ticket records. The Trip menu's "View seats" option displays a simple seat map (e.g. `[1:O] [2:X] [3:O]`) by checking every seat number against the ticket system, where `O` means open and `X` means occupied.
 
 A trip can only be cancelled if it has no active tickets, preventing a trip from being removed while passengers still hold valid tickets for it.
+
+
+
+## Passenger and BusPass Management
+
+A **Passenger** represents one person registered in the system, identified by a passenger ID, name, and phone number. Before a passenger is created or updated, the system checks that the name isn't empty and that the phone number is a valid length of digits; invalid details are rejected rather than silently accepted.
+
+A **BusPass** belongs to exactly one passenger and grants a fare discount or free travel, depending on its type:
+
+- **Student** — reduced fare
+- **Senior** — free travel
+- **Priority** — free travel
+
+Each pass also has an issue date, an expiry date, and a status (`active`, `suspended`, or `cancelled`). A passenger can only hold one active pass at a time; attempting to issue a second active pass to the same passenger is rejected. Dates are validated so that a pass's expiry date must always come after its issue date, and can be provided as either a text date (`"2026-01-01"`) or a real `date`/`datetime` object, since different parts of the system pass dates around in different formats.
+
+Whether a pass can actually be used on a given travel date is decided by a single check (`is_pass_valid`), which confirms the pass is still `active` and that the travel date falls on or before the expiry date. A pass that is expired, suspended, or cancelled is treated the same way as having no pass at all, the full fare applies.
+
+## Pricing Rules
+
+When a ticket is purchased, the price starts from the base fare of the trip's route, then is adjusted based on the passenger's pass, if they have one and it is currently valid:
+
+- **No pass, or an invalid/expired pass** → full base fare
+- **Valid student pass** → reduced fare
+- **Valid senior or priority pass** → free travel
+
+This means the same route can produce different ticket prices for different passengers, depending entirely on whether they hold a currently valid pass at the time of purchase — a pass that expired the day before travel does not apply, and the passenger is charged full fare instead.
+
+
