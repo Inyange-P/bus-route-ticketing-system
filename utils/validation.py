@@ -1,5 +1,7 @@
 # Shared validation functions for the bus route and ticket management system
 
+from datetime import datetime, date
+
 def validate_name(name):
     # Validate that the name is a non-empty string.
     if not name or not name.strip():
@@ -42,9 +44,12 @@ def validate_pass_type(pass_type):
 
 def validate_date_order(issue_date, expiry_date):
     # Validate that the issue date is before the expiry date.
-    from datetime import datetime
-    issue = datetime.strptime(issue_date, "%Y-%m-%d")
-    expiry = datetime.strptime(expiry_date, "%Y-%m-%d")
+    try:
+        issue = parse_date(issue_date)
+        expiry = parse_date(expiry_date)
+    except ValueError:
+        print("Invalid date format.")
+        return False
 
     if expiry <= issue:
         print("Invalid dates: expiry date must be after issue date.")
@@ -58,6 +63,16 @@ def validate_status(status):
         print(f"Invalid status: must be one of {valid_statuses}.")
         return False
     return True
+
+def parse_date(value):
+    # converts a string, datetime, or date into a plain date object.
+    if isinstance(value, str):
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    raise ValueError(f"Cannot parse date from value: {value}")
 
 def validate_positive_int(value):
     # Returns True only for a real positive whole number. 
@@ -93,7 +108,6 @@ def validate_seat_number(seat_number, total_seats):
 
     return seat_number <= total_seats
 
-# Abigail's section: Route validation functions
 def validate_route_text(value, field_name):
     # Check that route text fields such as origin and destination are not empty.
     if not isinstance(value, str) or not value.strip():
