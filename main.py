@@ -11,7 +11,7 @@ def route_menu():
         print("3. Search route")
         print("4. Update route")
         print("5. Delete route")
-        print("0. Back")
+        print("0. Back to the main menu")
 
         choice = input("Enter your choice: ")
 
@@ -108,6 +108,8 @@ def route_menu():
             print("Feature coming next.")
 
 def main():
+    load_routes(route_manager)
+
     while True:
         print("\n===== BUS ROUTE AND TICKETING SYSTEM =====")
         print("1. Route Management")
@@ -119,6 +121,7 @@ def main():
             route_menu()
 
         elif choice == "0":
+            save_routes(route_manager)
             print("Exiting system.")
             break
 
