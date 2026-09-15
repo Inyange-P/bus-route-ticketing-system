@@ -345,8 +345,10 @@ class TicketManager:
 
         expiry_date = bus_pass.expiry_date
 
-        if not isinstance(expiry_date, date):
-            raise TypeError( "Bus pass expiry_date must be a date." )
+        if isinstance(expiry_date, str):
+            expiry_date = date.fromisoformat(expiry_date)
+        elif not isinstance(expiry_date, date):
+            raise TypeError( "Bus pass expiry_date must be a date or an ISO date string." )
 
 # An expired pass does not give a discount. The ticket can still be purchased at the normal fare.
         if travel_date > expiry_date:
