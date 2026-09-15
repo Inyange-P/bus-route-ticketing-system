@@ -1,18 +1,18 @@
+from datetime import date
 from route_manager import RouteManager
 from trip_manager import TripManager
 from ticket_manager import TicketManager
-from utils.file_handler import load_routes, save_routes, load_trips, save_trips, load_tickets, save_tickets
-from utils.validation import(
-    validate_trip_date,
-    validate_departure_and_arrival,
-    validate_total_seats,
-    validate_record_exists
-)
+from passenger_manager import PassengerManager
+from bus_pass_manager import BusPassManager
+from utils.file_handler import (load_routes, save_routes, load_trips, save_trips, load_passengers, save_passengers, load_bus_passes, save_bus_passes, load_tickets, save_tickets,)
+from utils.validation import( validate_trip_date,validate_departure_and_arrival,validate_total_seats,validate_record_exists)
 
 
 route_manager = RouteManager()
 trip_manager = TripManager()
 ticket_manager = TicketManager()
+passenger_manager = PassengerManager()
+bus_pass_manager = BusPassManager()
 
 def route_menu():
     while True:
@@ -242,6 +242,9 @@ def trip_menu():
 def main():
     load_routes(route_manager)
     load_trips(trip_manager)
+    passenger_manager.passengers = load_passengers()
+    bus_pass_manager.bus_passes = load_bus_passes()
+    ticket_manager.tickets = load_tickets()
 
     while True:
         print("\n===== BUS ROUTE AND TICKETING SYSTEM =====")
