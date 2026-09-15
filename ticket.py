@@ -3,6 +3,8 @@
 from datetime import date
 from typing import Optional
 
+from utils.validation import validate_positive_int
+
 
 class Ticket:
 #Represent a ticket purchased by a passenger for a bus trip.
@@ -54,21 +56,15 @@ class Ticket:
 
     @staticmethod
     def _validate_id(value: int, field_name: str):
-#Validate an ID used by the ticket.
-        if isinstance(value, bool) or not isinstance(value, int):
-            raise ValueError(f"{field_name} must be an integer.")
-
-        if value <= 0:
-            raise ValueError(f"{field_name} must be greater than zero.")
+#Validate an ID used by the ticket. Uses the shared positive-int check from utils/validation.py so every module in the project agrees on what counts as a valid ID.
+        if not validate_positive_int(value):
+            raise ValueError(f"{field_name} must be a positive integer.")
 
     @staticmethod
     def _validate_seat_number(seat_number: int):
 #Validate the ticket's seat number.
-        if isinstance(seat_number, bool) or not isinstance(seat_number, int):
-            raise ValueError("Seat number must be an integer.")
-
-        if seat_number <= 0:
-            raise ValueError("Seat number must be greater than zero.")
+        if not validate_positive_int(seat_number):
+            raise ValueError("Seat number must be a positive integer.")
 
     @staticmethod
     def _validate_price(price: float):
@@ -85,11 +81,8 @@ class Ticket:
         if pass_id is None:
             return
 
-        if isinstance(pass_id, bool) or not isinstance(pass_id, int):
-            raise ValueError("Pass ID must be an integer.")
-
-        if pass_id <= 0:
-            raise ValueError("Pass ID must be greater than zero.")
+        if not validate_positive_int(pass_id):
+            raise ValueError("Pass ID must be a positive integer.")
 
     @classmethod
     def _validate_status(cls, status: str):

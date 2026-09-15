@@ -2,38 +2,34 @@ from datetime import date
 
 from ticket_manager import TicketManager
 
-
-class TestRoute:
+class DummyRoute:
     def __init__(self):
         self.route_id = 1
         self.base_fare = 50.00
 
-
-class TestTrip:
+class DummyTrip:
     def __init__(self):
         self.trip_id = 1
         self.route_id = 1
         self.travel_date = date(2026, 9, 10)
         self.total_seats = 40
 
-
-class TestPassenger:
+class DummyPassenger:
     def __init__(self):
         self.passenger_id = 101
-
 
 manager = TicketManager()
 
 routes = {
-    1: TestRoute()
+    1: DummyRoute()
 }
 
 trips = {
-    1: TestTrip()
+    1: DummyTrip()
 }
 
 passengers = {
-    101: TestPassenger()
+    101: DummyPassenger()
 }
 
 ticket = manager.purchase_ticket(
@@ -52,15 +48,15 @@ ticket = manager.purchase_ticket(
     passengers=passengers,
     trips=trips
 )
-class TestStudentPass:
+class DummyStudentPass:
     def __init__(self):
         self.pass_id = 1
-        self.passenger_id = 999
+        self.passenger_id = 101
         self.pass_type = "student"
         self.status = "active"
-        self.expiry_date = date(2026, 1, 1)
+        self.expiry_date = date(2027, 1, 1)
 passes = {
-        1: TestStudentPass()
+        1: DummyStudentPass()
 }
 ticket = manager.purchase_ticket(
     passenger_id=101,
@@ -74,7 +70,6 @@ ticket = manager.purchase_ticket(
 )
 
 print(ticket)
-
 
 print("\nTicket purchased successfully:")
 print(ticket)
