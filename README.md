@@ -56,28 +56,38 @@ The system includes:
 - Input validation and error handling
 - Saving and loading data between sessions
 
-## Route Management
+## System Architecture
 
-The Route Management section handles the journeys offered by the bus company.
+The system is Organized around independent modules that each manages one part of the bus ticketing process:
 
-Each route stores the following information:
+- **Route Management** - stores the journeys the bus company offers (origin, destination, distance, base fare)
+- **Trip Management** – schedules actual bus trips that run on a route (date, departure/arrival time, seat count)
+- **Passenger and BusPass Management** – registers passengers and issues discount passes
+- **Ticket Management** – handles ticket purchase, pricing, and cancellation, and is the single source of truth for which seats are occupied
 
-- Route ID
-- Origin
-- Destination
-- Distance in kilometres
-- Base fare
 
-The Route Management menu allows the user to:
+Each module has its own manager class (e.g. `TripManager`, `RouteManager`) that stores its records in a dictionary keyed by ID, and its own validation functions in `utils/validation.py`. Data is saved to and loaded from JSON files using shared functions in `utils/file_handler.py`, so information persists between sessions. All modules are connected together through the menus in `main.py`.
 
-- Add a route
-- Display available routes
-- Search for a route by destination
-- Update route details
-- Delete a route
+## Trip and Route Relationship
 
-Route IDs are generated automatically by the system.
+A **Trip** represents one scheduled journey on a specific date and time, and it always belongs to exactly one **Route**.
 
-The system also validates route information before it is accepted. The origin and destination cannot be empty, the distance must be greater than zero, and the base fare cannot be negative.
+- The Route defines the journey itself — where it goes and what it costs as a base fare.
+- The Trip defines when that journey actually happens — a specific date, departure time, arrival time, and how many seats are available.
 
-Route information is saved to file when the program exits and loaded again when the application starts, so previously created routes are not lost between sessions.
+Multiple trips can be created for the same route (for example, the same Beau Plan–Grand Baie route running on different days), but a trip cannot exist without a valid route. When a trip is created, the system checks that the given route ID actually exists before allowing the trip to be scheduled.
+
+This relationship also matters for pricing: when a ticket is purchased for a trip, the system looks up the trip's route to find the base fare, then applies any relevant bus pass discount on top of it.
+
+## Seat Management
+
+Seat availability for a trip is not tracked separately — it is determined directly from active tickets, so there is only one source of truth for whether a seat is taken.
+
+- Each trip has a fixed number of total seats.
+- A seat is considered available if no active ticket exists for that trip and seat number.
+- When a ticket is purchased, the seat becomes occupied because a matching ticket now exists.
+- When a ticket is cancelled, the seat becomes available again automatically, since the ticket is no longer active.
+
+This means booking a seat and buying a ticket are the same action — there's no separate "reserve a seat" step that could get out of sync with actual ticket records. The Trip menu's "View seats" option displays a simple seat map (e.g. `[1:O] [2:X] [3:O]`) by checking every seat number against the ticket system, where `O` means open and `X` means occupied.
+
+A trip can only be cancelled if it has no active tickets, preventing a trip from being removed while passengers still hold valid tickets for it.
