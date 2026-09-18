@@ -466,14 +466,16 @@ def ticket_menu():
                 else:
                     print(ticket)
 
-            except (ValueError, TypeError):
+            except (TypeError):
                 print("Invalid ticket ID entered.")
+            except (ValueError):
+                print("Ticket ID has to be a number")
 
         elif choice == "4":
             try:
                 ticket_id = int(input("Enter ticket ID to cancel: "))
             except ValueError:
-                print("Invalid ticket ID entered.")
+                print("Invalid ticket ID entered. Ticket ID must be a whole number.")
                 continue
 
             try:
