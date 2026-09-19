@@ -28,10 +28,10 @@
         "base_fare": 40.0
     },
     {
-        "route_id": 5,
-        "origin": "123",
-        "destination": "123",
-        "distance_km": 123.0,
-        "base_fare": 123.0
+        "route_id": 6,
+        "origin": "Persistent Test",
+        "destination": "Port Louis",
+        "distance_km": 10.0,
+        "base_fare": 25.0
     }
 ]

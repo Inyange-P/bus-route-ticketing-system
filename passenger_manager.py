@@ -57,11 +57,15 @@ class PassengerManager:
         if name is not None:
             if not validate_name(name):
                 return None
-            passenger.name = name
 
         if phone is not None:
             if not validate_phone(phone):
                 return None
+
+        # Apply changes only after every supplied field has passed validation.
+        if name is not None:
+            passenger.name = name
+        if phone is not None:
             passenger.phone = phone
 
         return passenger
