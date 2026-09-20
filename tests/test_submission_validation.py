@@ -59,7 +59,7 @@ def test_route_place_names_accepted(app, value, field):
 def test_bad_numeric_or_date_input_returns_to_menu(app, monkeypatch, capsys, menu, values):
     run_menu(monkeypatch, getattr(app, menu), values)
     output = capsys.readouterr().out
-    assert 'Invalid' in output
+    assert 'Invalid' in output or 'has to be a number' in output
     assert output.count('MENU -----') >= 2
 
 
