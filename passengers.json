@@ -23,5 +23,10 @@
         "passenger_id": 5,
         "name": "Test ",
         "phone": "59900112"
+    },
+    {
+        "passenger_id": 6,
+        "name": "Inyange",
+        "phone": "58587924"
     }
 ]

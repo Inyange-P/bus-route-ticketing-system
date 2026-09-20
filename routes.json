@@ -33,5 +33,12 @@
         "destination": "123",
         "distance_km": 123.0,
         "base_fare": 123.0
+    },
+    {
+        "route_id": 6,
+        "origin": "Pamplemousses",
+        "destination": "SSRN",
+        "distance_km": 10000.0,
+        "base_fare": 50.0
     }
 ]

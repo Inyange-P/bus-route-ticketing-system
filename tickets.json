@@ -38,5 +38,15 @@
         "price": 40.0,
         "purchase_date": "2026-09-15",
         "status": "active"
+    },
+    {
+        "ticket_id": 5,
+        "passenger_id": 6,
+        "trip_id": 2,
+        "seat_number": 12,
+        "pass_id": null,
+        "price": 50.0,
+        "purchase_date": "2026-09-20",
+        "status": "active"
     }
 ]
