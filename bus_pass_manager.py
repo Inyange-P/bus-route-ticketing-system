@@ -87,6 +87,14 @@ class BusPassManager:
         if not validate_date_order(bus_pass.issue_date, new_expiry_date):
             return None
         
+        # Renewing reactivates this pass, so check for another active pass first.
+        for other_pass in self.bus_passes.values():
+            if (other_pass.pass_id != pass_id
+                    and other_pass.passenger_id == bus_pass.passenger_id
+                    and other_pass.status == "active"):
+                print("Cannot renew: the passenger already has another active pass.")
+                return None
+
         bus_pass.expiry_date = new_expiry_date
         bus_pass.status = "active"  # Reactivate the pass upon renewal
         return bus_pass

@@ -1,11 +1,15 @@
 # Shared validation functions for the bus route and ticket management system
 
 from datetime import datetime, date
+import math
 
 def validate_name(name):
-    # Validate that the name is a non-empty string.
-    if not name or not name.strip():
-        print("Invalid name: name cannot be empty.")
+    # Names may include numbers, but must contain at least one letter.
+    if not isinstance(name, str) or not name.strip():
+        print("Invalid name: must be non-empty text.")
+        return False
+    if not any(character.isalpha() for character in name):
+        print("Invalid name: must contain at least one letter.")
         return False
     return True
 
@@ -126,6 +130,10 @@ def validate_distance(distance_km):
         print("Invalid distance: distance must be a number.")
         return False
 
+    if not math.isfinite(distance_km):
+        print("Invalid distance: distance must be finite.")
+        return False
+
     if distance_km <= 0:
         print("Invalid distance: distance must be greater than 0.")
         return False
@@ -136,6 +144,10 @@ def validate_fare(base_fare):
     # Fare must be a number and cannot be negative.
     if not isinstance(base_fare, (int, float)) or isinstance(base_fare, bool):
         print("Invalid fare: fare must be a number.")
+        return False
+
+    if not math.isfinite(base_fare):
+        print("Invalid fare: fare must be finite.")
         return False
 
     if base_fare < 0:
