@@ -41,12 +41,21 @@
     },
     {
         "ticket_id": 5,
+<<<<<<< HEAD
         "passenger_id": 6,
         "trip_id": 2,
         "seat_number": 12,
         "pass_id": null,
         "price": 50.0,
         "purchase_date": "2026-09-20",
+=======
+        "passenger_id": 2,
+        "trip_id": 1,
+        "seat_number": 3,
+        "pass_id": null,
+        "price": 40.0,
+        "purchase_date": "2026-09-18",
+>>>>>>> ba27f23 (Update tickets and trips data)
         "status": "active"
     }
 ]
